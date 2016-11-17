@@ -1,0 +1,16 @@
+#Minimum Number
+0
+#Maximum Number
+10
+#Table
+5;10;13
+#list Symboles
++;-;*;/
+#time
+false
+#number of seconds
+15
+#Result all the time positive for substraction
+true
+#Language & country
+fr;FR
