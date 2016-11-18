@@ -6,7 +6,9 @@
 package com.delbiaggio.haagahelia.swingmath;
 
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
+import com.delbiaggio.haagahelia.swingmath.gameFrameComponents.JLabelBackground;
 import com.delbiaggio.haagahelia.swingmath.tools.FileManager;
+import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerBackgroundColor;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerRun;
 import java.awt.BorderLayout;
@@ -31,7 +33,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class GameFrame extends javax.swing.JFrame {
 
-    private int LIFES = 3;
+    private int LIFES = 7;
     private int nbPoints = 0;
     private int nbLifes = LIFES;
     private int TIME = 15;
@@ -41,6 +43,10 @@ public class GameFrame extends javax.swing.JFrame {
     private Timer t = new Timer();
     private TimerRun run;
     public ResourceBundle resBund;
+    public ResourceBundle resBundImg;
+
+    private ArrayList<JLabel> lstLifes = new ArrayList<>();
+    private ArrayList<JLabel> lstOperations = new ArrayList<>();
 
     public GameFrame() {
         initComponents();
@@ -55,6 +61,7 @@ public class GameFrame extends javax.swing.JFrame {
         manageNumberGeneration();
         tfResult.requestFocusInWindow();
         resBund = ResourceBundle.getBundle("MessagesBundle", conf.getLocal());
+        resBundImg = ResourceBundle.getBundle("ImgResources");
         setTranslation();
         setLabelTime(conf.isTime());
         validate();
@@ -62,13 +69,96 @@ public class GameFrame extends javax.swing.JFrame {
         PannelBackground p = new PannelBackground();
         p.setSize(504, 186);
         p.validate();
+
+        setPencilJlabel();
+//        setLevelImage();
+        //setSymbolPictures();
+
+        new JLabelBackground(this).setLayout();
+        //setBackgroundJlabel();
         
-        setBackgroundJlabel();
-        
-        
+        showOperations();
+
     }
     
-    private void setPosition(){        
+    public void showOperations(){
+        ArrayList<String> lstOP = conf.getLstOp();
+        for (JLabel lab : lstOperations) {
+            lab.setVisible(false);
+        }
+        int x = 271;
+        int y = 376;
+        int width = 50;
+        int length = 50;
+        for (String string : lstOP) {
+            System.out.println(string);
+            findOperations(string,x,y,width,length);
+            x+= 60;
+        }
+    }
+    
+    private void findOperations(String op,int x, int y, int width, int length){
+        for (JLabel lab : lstOperations) {
+            if (resBundImg.getString(op).equals(lab.getName())) {
+                lab.setVisible(true);
+                lab.setBounds(x, y, width, length);
+            }
+        }
+    }
+    
+    
+    public ArrayList<JLabel> getLstOperations(){
+        return lstOperations;
+    }
+
+//    private void setSymbolPictures() {
+//        BufferedImage bi = null;
+//        try {
+//            InputStream s = getClass().getClassLoader().getResourceAsStream("plus.png");
+//            bi = ImageIO.read(s);
+//            ImageIcon img = new ImageIcon(bi);
+//            JLabel back = new JLabel(img);
+//            back.setBounds(450, 452, 50, 49);
+//            this.add(back);
+//            lstLifes.add(back);
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage() + " " + e.getStackTrace());
+//        }
+//    }
+
+//    private void setLevelImage() {
+//        BufferedImage bi = null;
+//        try {
+//            InputStream s = getClass().getClassLoader().getResourceAsStream("tableau.png");
+//            bi = ImageIO.read(s);
+//            ImageIcon img = new ImageIcon(bi);
+//            JLabel back = new JLabel(img);
+//            back.setBounds(593, 452, 50, 89);
+//            this.add(back);
+//            lstLifes.add(back);
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage() + " " + e.getStackTrace());
+//        }
+//    }
+
+    private void setPencilJlabel() {
+        BufferedImage bi = null;
+        for (int i = 0; i < nbLifes; i++) {
+            try {
+                InputStream s = getClass().getClassLoader().getResourceAsStream("pencil3.png");
+                bi = ImageIO.read(s);
+                ImageIcon img = new ImageIcon(bi);
+                JLabel back = new JLabel(img);
+                back.setBounds(-260 + (i * 30), -160, 1024, 805);
+                this.add(back);
+                lstLifes.add(back);
+            } catch (Exception e) {
+                System.out.println(e.getMessage() + " " + e.getStackTrace());
+            }
+        }
+    }
+
+    private void setPosition() {
         btnCheck.setBounds(527, 308, 130, 25);
         lblPts.setBounds(164, 190, 200, 30);
         lblLifes.setBounds(164, 228, 200, 30);
@@ -79,32 +169,13 @@ public class GameFrame extends javax.swing.JFrame {
         lblEqual.setBounds(365, 318, 50, 15);
         tfResult.setBounds(385, 309, 120, 30);
         lblTime.setBounds(358, 190, 200, 30);
+        lblLstOperations.setBounds(153, 390, 200, 30);
     }
 
     private void setBackgroundJlabel() {
-        BufferedImage bi = null;
-        try {
-            InputStream s = getClass().getClassLoader().getResourceAsStream(BACKGROUND);
-            bi = ImageIO.read(s);
-            ImageIcon img = new ImageIcon(bi);
-            JLabel back = new JLabel(img);
-            back.setBounds(-120,-100,1024,805);
-            this.add(back);
-        } catch (Exception e) {
-            System.out.println(e.getMessage() + " " + e.getStackTrace());
-        }
-    }
-
-    private void repaintComponents() {
-        lblEqual.repaint();
-        lblLifes.repaint();
-        lblNumber1.repaint();
-        lblNumber2.repaint();
-        lblOp.repaint();
-        lblPts.repaint();
-        lblTime.repaint();
-        btnCheck.repaint();
-        btnSettings.repaint();
+        JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon(BACKGROUND));
+        back.setBounds(-120, -100, 1024, 805);
+        this.add(back);
     }
 
     public void setLabelTime(boolean result) {
@@ -115,7 +186,7 @@ public class GameFrame extends javax.swing.JFrame {
         btnCheck.setText(StringUtils.capitalize(resBund.getString("validate")));
         lblTime.setText(StringUtils.capitalize(resBund.getString("time")));
         lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": 0"));
-        lblLifes.setText(StringUtils.capitalize(resBund.getString("lifes") + ": XXX"));
+        lblLifes.setText(StringUtils.capitalize(resBund.getString("lifes") + ": "));
         btnSettings.setText(StringUtils.capitalize(resBund.getString("settings")));
     }
 
@@ -169,7 +240,9 @@ public class GameFrame extends javax.swing.JFrame {
     }
 
     public void stopTimer() {
-        run.cancel();
+        if (run != null) {
+            run.cancel();    
+        }
     }
 
     public void manageNumberGeneration() {
@@ -208,17 +281,19 @@ public class GameFrame extends javax.swing.JFrame {
         showLifes();
     }
 
-    public void resetLifes() {
+    public void resetLifesAndPoints() {
+        nbPoints = 0;
+        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": 0"));
         nbLifes = LIFES;
-        showLifes();
+        for (int i = 0; i < nbLifes; i++) {
+            lstLifes.get(i).setVisible(true);
+        }
     }
 
     private void showLifes() {
-        StringBuilder str = new StringBuilder(StringUtils.capitalize(resBund.getString("lifes") + ": "));
-        for (int i = nbLifes; i > 0; i--) {
-            str.append("X");
+        for (int i = nbLifes; i >= 0 && i < LIFES; i++) {
+            lstLifes.get(i).setVisible(false);
         }
-        lblLifes.setText(str.toString());
     }
 
     /*
@@ -280,6 +355,7 @@ public class GameFrame extends javax.swing.JFrame {
         tfResult = new javax.swing.JTextField();
         btnCheck = new javax.swing.JButton();
         lblPosition = new javax.swing.JLabel();
+        lblLstOperations = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(787, 614));
@@ -342,6 +418,9 @@ public class GameFrame extends javax.swing.JFrame {
 
         lblPosition.setText("jLabel1");
 
+        lblLstOperations.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        lblLstOperations.setText("Operations: ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -376,8 +455,13 @@ public class GameFrame extends javax.swing.JFrame {
                         .addComponent(tfResult, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(368, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGap(160, 160, 160)
-                .addComponent(lblTime, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(160, 160, 160)
+                        .addComponent(lblTime, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(lblLstOperations)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -403,7 +487,9 @@ public class GameFrame extends javax.swing.JFrame {
                     .addComponent(lblNumber2)
                     .addComponent(lblEqual)
                     .addComponent(tfResult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
+                .addComponent(lblLstOperations)
+                .addGap(100, 100, 100)
                 .addComponent(lblPosition)
                 .addGap(21, 21, 21))
         );
@@ -428,7 +514,7 @@ public class GameFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSettingsActionPerformed
 
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
-        lblPosition.setText("X = " + evt.getX() + " Y = " + (evt.getY()-24));
+        lblPosition.setText("X = " + evt.getX() + " Y = " + (evt.getY() - 24));
         lblPosition.validate();
     }//GEN-LAST:event_formMouseMoved
 
@@ -472,6 +558,7 @@ public class GameFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnSettings;
     private javax.swing.JLabel lblEqual;
     private javax.swing.JLabel lblLifes;
+    private javax.swing.JLabel lblLstOperations;
     private javax.swing.JLabel lblNumber1;
     private javax.swing.JLabel lblNumber2;
     private javax.swing.JLabel lblOp;

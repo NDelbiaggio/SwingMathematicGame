@@ -33,6 +33,7 @@ public class Settings extends javax.swing.JFrame {
     private Translation currentTrans;
     private String BACKGROUND = "backgroundSettings5.jpg";
     private boolean byUser = true;
+    
 
     public Settings(GameFrame parent) {
         initComponents();
@@ -138,13 +139,6 @@ public class Settings extends javax.swing.JFrame {
         doc.setDocumentFilter(new MyIntFilter());
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        //paintBackground(g);
-        reapaintComponent();
-    }
-
     public static Settings getCurrent(GameFrame parent) {
         if (current == null) {
             current = new Settings(parent);
@@ -196,10 +190,13 @@ public class Settings extends javax.swing.JFrame {
         if (ckTime.isSelected()) {
             conf.setNbSeconds(Integer.parseInt(tfTime.getText()));
             parent.testTimer();
+        }else{
+            parent.stopTimer();
         }
         conf.setLocal(Language.valueOf(currentTrans.getKey()).getLocale());
         parent.setLabelTime(conf.isTime());
-        parent.resetLifes();
+        parent.resetLifesAndPoints();
+        parent.showOperations();
         parent.validate();
     }
 
@@ -417,6 +414,7 @@ public class Settings extends javax.swing.JFrame {
         lblMax.setText("Max number");
 
         tfTable.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        tfTable.setToolTipText("Veuillez insérer les tables selon l'exemple");
         tfTable.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtChanged(evt);
