@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.delbiaggio.haagahelia.swingmath.gameFrameComponents;
 
 import com.delbiaggio.haagahelia.swingmath.GameFrame;
-import com.delbiaggio.haagahelia.swingmath.controller.ListArchievements;
+import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import javax.swing.JLabel;
 
 /**
@@ -18,16 +14,21 @@ import javax.swing.JLabel;
 public class LoaderImage {
 
     private String BACKGROUND = "mainBackground9.jpg";
+    private String IMG_RES = "ImgResources";
+    private String IMG_BORDER = "backgroundBorder.png";
+    
     private GameFrame parent;
+    ResourceBundle resBundImg;
 
     public LoaderImage(GameFrame parent) {
         this.parent = parent;
     }
 
     public void setLayout() {
+        resBundImg  = ResourceBundle.getBundle(IMG_RES);
         loadOperations();
         loadArchivements();
-        JLabel border = getCustomisedJLabel("backgroundBorder.png", -120, -100, 1024, 805);
+        JLabel border = getCustomisedJLabel(IMG_BORDER, -120, -100, 1024, 805);
         parent.add(border);
         loadAnnimations();
         parent.add(getCustomisedJLabel(BACKGROUND, -120, -100, 1024, 805));
@@ -35,10 +36,10 @@ public class LoaderImage {
 
     private void loadOperations() {
         ArrayList<JLabel> lstOp = parent.getLstOperations();
-        JLabel plus = getCustomisedJLabel("plus.png", 271, 376, 50, 50);
-        JLabel minus = getCustomisedJLabel("minus.png", 345, 376, 50, 50);
-        JLabel division = getCustomisedJLabel("division.png", 400, 376, 50, 50);
-        JLabel multiplication = getCustomisedJLabel("multiplication.png", 460, 376, 50, 50);
+        JLabel plus = getCustomisedJLabel(resBundImg.getString("+"), 271, 376, 50, 50);
+        JLabel minus = getCustomisedJLabel(resBundImg.getString("-"), 345, 376, 50, 50);
+        JLabel division = getCustomisedJLabel(resBundImg.getString("/"), 400, 376, 50, 50);
+        JLabel multiplication = getCustomisedJLabel(resBundImg.getString("*"), 460, 376, 50, 50);
         addInArrayAndParent(lstOp, plus);
         addInArrayAndParent(lstOp, minus);
         addInArrayAndParent(lstOp, division);
@@ -46,7 +47,7 @@ public class LoaderImage {
     }
     
     private void loadArchivements() {
-        ListArchievements lstArch = parent.getLstArchivement();
+        ListLabel lstArch = parent.getLstArchivement();
         JLabel regle = getCustomisedJLabel("regle.png", 600, 106, 50, 50);
         regle.setVisible(false);
         JLabel compas = getCustomisedJLabel("compas.png", 600, 106, 50, 89);
@@ -65,7 +66,7 @@ public class LoaderImage {
     }
     
     private void loadAnnimations(){
-        ListArchievements lstAnn = parent.getLstAnnimation();
+        ListLabel lstAnn = parent.getLstAnnimation();
         JLabel amb = getCustomisedJLabel("ambulance.png", 0, 0, 60, 45);
         amb.setVisible(false);
         JLabel pompier = getCustomisedJLabel("pompier.png", 0, 0, 60, 45);

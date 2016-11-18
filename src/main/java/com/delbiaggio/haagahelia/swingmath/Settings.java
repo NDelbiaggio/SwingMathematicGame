@@ -196,7 +196,7 @@ public class Settings extends javax.swing.JFrame {
         conf.setLocal(Language.valueOf(currentTrans.getKey()).getLocale());
         parent.setLabelTime(conf.isTime());
         parent.resetLifesAndPoints();
-        parent.showOperations();
+        parent.showOperationsImage();
                       
         parent.resetArchivement();
         parent.getLstArchivement().resetCurrent();

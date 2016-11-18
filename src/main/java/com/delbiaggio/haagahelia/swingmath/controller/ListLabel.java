@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author delbiaggionicolas
  */
-public class ListArchievements<JLabel> extends ArrayList<JLabel> {
+public class ListLabel<JLabel> extends ArrayList<JLabel> {
 
     int current = 0;
 

@@ -25,7 +25,5 @@ public class TimerRun extends TimerTask {
             gf.decreaseLife();
         }
         time--;
-        
-    }
-    
+    }    
 }

@@ -5,27 +5,20 @@
  */
 package com.delbiaggio.haagahelia.swingmath;
 
-import com.delbiaggio.haagahelia.swingmath.controller.ListArchievements;
+import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.gameFrameComponents.LoaderImage;
 import com.delbiaggio.haagahelia.swingmath.tools.FileManager;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
+import com.delbiaggio.haagahelia.swingmath.tools.PGCDCalculator;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerAnnimation;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerBackgroundColor;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerRun;
-import java.awt.BorderLayout;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.text.PlainDocument;
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +33,6 @@ public class GameFrame extends javax.swing.JFrame {
     private int nbPoints = 0;
     private int nbLifes = LIFES;
     private int TIME = 15;
-    private String BACKGROUND = "mainBackground9.jpg";
 
     private Configuration conf;
     private Timer t = new Timer();
@@ -50,10 +42,8 @@ public class GameFrame extends javax.swing.JFrame {
 
     private ArrayList<JLabel> lstLifes = new ArrayList<>();
     private ArrayList<JLabel> lstOperations = new ArrayList<>();
-    private ListArchievements<JLabel> lstArchivement = new ListArchievements<>();
-    private ListArchievements<JLabel> lstAnnimation = new ListArchievements<>();
-
-    
+    private ListLabel<JLabel> lstArchivement = new ListLabel<>();
+    private ListLabel<JLabel> lstAnnimation = new ListLabel<>();
 
     public GameFrame() {
         initComponents();
@@ -77,37 +67,35 @@ public class GameFrame extends javax.swing.JFrame {
         p.setSize(504, 186);
         p.validate();
 
-        setPencilJlabel();
-//        setLevelImage();
-        //setSymbolPictures();
+        showLifesImage();
 
         new LoaderImage(this).setLayout();
-        //setBackgroundJlabel();
 
-        showOperations();
+        showOperationsImage();
 
     }
 
-    public void showOperations() {
-        ArrayList<String> lstOP = conf.getLstOp();
+    private void hideOperationsImage() {
         for (JLabel lab : lstOperations) {
             lab.setVisible(false);
         }
+    }
+    
+    public void showOperationsImage() {
+        ArrayList<String> lstOP = conf.getLstOp();
+        hideOperationsImage();
         int x = 271;
-        int y = 376;
-        int width = 50;
-        int length = 50;
-        for (String string : lstOP) {
-            findOperations(string, x, y, width, length);
+        for (String op : lstOP) {
+            findOperations(op,x);
             x += 60;
         }
     }
 
-    private void findOperations(String op, int x, int y, int width, int length) {
+    private void findOperations(String op, int x) {
         for (JLabel lab : lstOperations) {
             if (resBundImg.getString(op).equals(lab.getName())) {
                 lab.setVisible(true);
-                lab.setBounds(x, y, width, length);
+                lab.setBounds(x, lab.getY(), lab.getWidth(), lab.getHeight());
             }
         }
     }
@@ -116,58 +104,20 @@ public class GameFrame extends javax.swing.JFrame {
         return lstOperations;
     }
 
-    public ListArchievements<JLabel> getLstArchivement() {
+    public ListLabel<JLabel> getLstArchivement() {
         return lstArchivement;
     }
 
-    public ListArchievements<JLabel> getLstAnnimation() {
+    public ListLabel<JLabel> getLstAnnimation() {
         return lstAnnimation;
     }
-    
-    
 
-//    private void setSymbolPictures() {
-//        BufferedImage bi = null;
-//        try {
-//            InputStream s = getClass().getClassLoader().getResourceAsStream("plus.png");
-//            bi = ImageIO.read(s);
-//            ImageIcon img = new ImageIcon(bi);
-//            JLabel back = new JLabel(img);
-//            back.setBounds(450, 452, 50, 49);
-//            this.add(back);
-//            lstLifes.add(back);
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage() + " " + e.getStackTrace());
-//        }
-//    }
-//    private void setLevelImage() {
-//        BufferedImage bi = null;
-//        try {
-//            InputStream s = getClass().getClassLoader().getResourceAsStream("tableau.png");
-//            bi = ImageIO.read(s);
-//            ImageIcon img = new ImageIcon(bi);
-//            JLabel back = new JLabel(img);
-//            back.setBounds(593, 452, 50, 89);
-//            this.add(back);
-//            lstLifes.add(back);
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage() + " " + e.getStackTrace());
-//        }
-//    }
-    private void setPencilJlabel() {
-        BufferedImage bi = null;
+    private void showLifesImage() {
         for (int i = 0; i < nbLifes; i++) {
-            try {
-                InputStream s = getClass().getClassLoader().getResourceAsStream("pencil3.png");
-                bi = ImageIO.read(s);
-                ImageIcon img = new ImageIcon(bi);
-                JLabel back = new JLabel(img);
-                back.setBounds(-260 + (i * 30), -160, 1024, 805);
-                this.add(back);
-                lstLifes.add(back);
-            } catch (Exception e) {
-                System.out.println(e.getMessage() + " " + e.getStackTrace());
-            }
+            JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon("pencil3.png"));
+            back.setBounds(-260 + (i * 30), -160, 1024, 805);
+            this.add(back);
+            lstLifes.add(back);
         }
     }
 
@@ -183,12 +133,6 @@ public class GameFrame extends javax.swing.JFrame {
         tfResult.setBounds(385, 309, 120, 30);
         lblTime.setBounds(358, 190, 200, 30);
         lblLstOperations.setBounds(153, 390, 200, 30);
-    }
-
-    private void setBackgroundJlabel() {
-        JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon(BACKGROUND));
-        back.setBounds(-120, -100, 1024, 805);
-        this.add(back);
     }
 
     public void setLabelTime(boolean result) {
@@ -219,19 +163,14 @@ public class GameFrame extends javax.swing.JFrame {
             String op = lblOp.getText();
             int result = Integer.parseInt(tfResult.getText().trim());
             if (checkEquation(nb1, nb2, op, result)) {
-                nbPoints++;
-                lblPts.setText("Points: " + nbPoints);
+                incrementPoints();
                 showArchivement();
-
                 manageNumberGeneration();
                 colorBackRed(Color.green, 2);
-                tfResult.setText(" ");
-                tfResult.setText("");
+                tfResult.setText(" ");tfResult.setText("");
                 if (conf.isTime()) {
                     testTimer();
                 }
-
-                lblPts.validate();
             } else {
                 colorBackRed(Color.red, 2);
                 decreaseLife();
@@ -239,32 +178,46 @@ public class GameFrame extends javax.swing.JFrame {
             tfResult.requestFocus();
         }
     }
+    
+    private void incrementPoints(){
+        nbPoints++;
+        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": "+ nbPoints));
+        lblPts.validate();
+    }
 
     public void showArchivement() {
         if (nbPoints % 10 == 0) {
             showAnnimation();
         }
-        if (nbPoints == 1) {
-            lstArchivement.getNext().setVisible(true);
-        } else if (nbPoints == 5) {
-            lstArchivement.getPrevious().setVisible(false);
-            lstArchivement.getNext().setVisible(true);
-        } else if (nbPoints == 10) {
-            lstArchivement.getPrevious().setVisible(false);
-            lstArchivement.getNext().setVisible(true);
-        } else if (nbPoints == 25) {
-            lstArchivement.getPrevious().setVisible(false);
-            lstArchivement.getNext().setVisible(true);
-        } else if (nbPoints == 50) {
-            lstArchivement.getPrevious().setVisible(false);
-            lstArchivement.getNext().setVisible(true);
+        switch (nbPoints) {
+            case 1:
+                lstArchivement.getNext().setVisible(true);
+                break;
+            case 5:
+                lstArchivement.getPrevious().setVisible(false);
+                lstArchivement.getNext().setVisible(true);
+                break;
+            case 10:
+                lstArchivement.getPrevious().setVisible(false);
+                lstArchivement.getNext().setVisible(true);
+                break;
+            case 25:
+                lstArchivement.getPrevious().setVisible(false);
+                lstArchivement.getNext().setVisible(true);
+                break;
+            case 50:
+                lstArchivement.getPrevious().setVisible(false);
+                lstArchivement.getNext().setVisible(true);
+                break;
+            default:
+                break;
         }
     }
 
     public void showAnnimation() {
         Timer tAnn = new Timer();
         TimerAnnimation runAnn = new TimerAnnimation(lstAnnimation.getNextWithCycle());
-        tAnn.scheduleAtFixedRate(runAnn, 0, 15);        
+        tAnn.scheduleAtFixedRate(runAnn, 0, 15);
     }
 
     public void resetArchivement() {
@@ -299,30 +252,30 @@ public class GameFrame extends javax.swing.JFrame {
         int aleaNumb = generateNumber(conf.getMinNumb(), conf.getMaxNumb());
         int indTabRand = generateNumber(0, conf.getLstTable().size() - 1);
         Integer nbTable = conf.getLstTable().get(indTabRand);
-        String nb1;
-        String nb2;
+        int [] result;
         if (symb.equals("/")) {
-            nb1 = nbTable + "";
-            ArrayList<Integer> lstPGCD = getPGCD(nbTable);
-            nb2 = lstPGCD.get(generateNumber(0, lstPGCD.size() - 1)) + "";
+            result = getGeneratedNumberDivision(nbTable);
         } else if (conf.isSoustractionPos() && symb.equals("-")) {
             if (aleaNumb >= nbTable) {
-                nb1 = aleaNumb + "";
-                nb2 = nbTable + "";
+                result = new int[]{aleaNumb,nbTable};
             } else {
-                nb1 = nbTable + "";
-                nb2 = aleaNumb + "";
+                result = new int[]{nbTable,aleaNumb};
             }
         } else if (alea == 0) {
-            nb1 = aleaNumb + "";
-            nb2 = nbTable + "";
+            result = new int[]{aleaNumb,nbTable};
         } else {
-            nb1 = nbTable + "";
-            nb2 = aleaNumb + "";
+            result = new int[]{nbTable,aleaNumb};
         }
-        lblNumber1.setText(nb1);
-        lblNumber2.setText(nb2);
+        lblNumber1.setText(result[0] + "");
+        lblNumber2.setText(result[1]+ "");
     }
+    
+    private int[] getGeneratedNumberDivision(int nbTable ){
+        int nb1 = nbTable;
+        ArrayList<Integer> lstPGCD = PGCDCalculator.getPGCD(nbTable);
+        int nb2 = lstPGCD.get(generateNumber(0, lstPGCD.size() - 1));
+        return new int[]{nb1,nb2};        
+    } 
 
     public void decreaseLife() {
         nbLifes--;
@@ -333,8 +286,8 @@ public class GameFrame extends javax.swing.JFrame {
         nbPoints = 0;
         lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": 0"));
         nbLifes = LIFES;
-        for (int i = 0; i < nbLifes; i++) {
-            lstLifes.get(i).setVisible(true);
+        for (JLabel life : lstLifes) {
+            life.setVisible(true);
         }
     }
 
@@ -371,21 +324,6 @@ public class GameFrame extends javax.swing.JFrame {
             default:
                 throw new AssertionError();
         }
-    }
-
-    private ArrayList<Integer> getPGCD(int number) {
-        ArrayList<Integer> lstPGCD = new ArrayList<>();
-        int middle = (int) Math.sqrt(number);
-        if (number % middle == 0) {
-            lstPGCD.add(middle);
-        }
-        for (int i = middle - 1; i > 0; i--) {
-            if (number % i == 0) {
-                lstPGCD.add(i);
-                lstPGCD.add(number / i);
-            }
-        }
-        return lstPGCD;
     }
 
     @SuppressWarnings("unchecked")
