@@ -1,11 +1,11 @@
 #Minimum Number
 1
 #Maximum Number 
-10
+1
 #Table 
-13;14;
+1;
 #list Symboles
--;/;
++;
 #time 
 false
 #number of seconds

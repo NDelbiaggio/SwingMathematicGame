@@ -5,10 +5,12 @@
  */
 package com.delbiaggio.haagahelia.swingmath;
 
+import com.delbiaggio.haagahelia.swingmath.controller.ListArchievements;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
-import com.delbiaggio.haagahelia.swingmath.gameFrameComponents.JLabelBackground;
+import com.delbiaggio.haagahelia.swingmath.gameFrameComponents.LoaderImage;
 import com.delbiaggio.haagahelia.swingmath.tools.FileManager;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
+import com.delbiaggio.haagahelia.swingmath.tools.TimerAnnimation;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerBackgroundColor;
 import com.delbiaggio.haagahelia.swingmath.tools.TimerRun;
 import java.awt.BorderLayout;
@@ -18,6 +20,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import javax.imageio.ImageIO;
@@ -47,6 +50,10 @@ public class GameFrame extends javax.swing.JFrame {
 
     private ArrayList<JLabel> lstLifes = new ArrayList<>();
     private ArrayList<JLabel> lstOperations = new ArrayList<>();
+    private ListArchievements<JLabel> lstArchivement = new ListArchievements<>();
+    private ListArchievements<JLabel> lstAnnimation = new ListArchievements<>();
+
+    
 
     public GameFrame() {
         initComponents();
@@ -74,14 +81,14 @@ public class GameFrame extends javax.swing.JFrame {
 //        setLevelImage();
         //setSymbolPictures();
 
-        new JLabelBackground(this).setLayout();
+        new LoaderImage(this).setLayout();
         //setBackgroundJlabel();
-        
+
         showOperations();
 
     }
-    
-    public void showOperations(){
+
+    public void showOperations() {
         ArrayList<String> lstOP = conf.getLstOp();
         for (JLabel lab : lstOperations) {
             lab.setVisible(false);
@@ -91,13 +98,12 @@ public class GameFrame extends javax.swing.JFrame {
         int width = 50;
         int length = 50;
         for (String string : lstOP) {
-            System.out.println(string);
-            findOperations(string,x,y,width,length);
-            x+= 60;
+            findOperations(string, x, y, width, length);
+            x += 60;
         }
     }
-    
-    private void findOperations(String op,int x, int y, int width, int length){
+
+    private void findOperations(String op, int x, int y, int width, int length) {
         for (JLabel lab : lstOperations) {
             if (resBundImg.getString(op).equals(lab.getName())) {
                 lab.setVisible(true);
@@ -105,11 +111,20 @@ public class GameFrame extends javax.swing.JFrame {
             }
         }
     }
-    
-    
-    public ArrayList<JLabel> getLstOperations(){
+
+    public ArrayList<JLabel> getLstOperations() {
         return lstOperations;
     }
+
+    public ListArchievements<JLabel> getLstArchivement() {
+        return lstArchivement;
+    }
+
+    public ListArchievements<JLabel> getLstAnnimation() {
+        return lstAnnimation;
+    }
+    
+    
 
 //    private void setSymbolPictures() {
 //        BufferedImage bi = null;
@@ -125,7 +140,6 @@ public class GameFrame extends javax.swing.JFrame {
 //            System.out.println(e.getMessage() + " " + e.getStackTrace());
 //        }
 //    }
-
 //    private void setLevelImage() {
 //        BufferedImage bi = null;
 //        try {
@@ -140,7 +154,6 @@ public class GameFrame extends javax.swing.JFrame {
 //            System.out.println(e.getMessage() + " " + e.getStackTrace());
 //        }
 //    }
-
     private void setPencilJlabel() {
         BufferedImage bi = null;
         for (int i = 0; i < nbLifes; i++) {
@@ -208,6 +221,8 @@ public class GameFrame extends javax.swing.JFrame {
             if (checkEquation(nb1, nb2, op, result)) {
                 nbPoints++;
                 lblPts.setText("Points: " + nbPoints);
+                showArchivement();
+
                 manageNumberGeneration();
                 colorBackRed(Color.green, 2);
                 tfResult.setText(" ");
@@ -222,6 +237,39 @@ public class GameFrame extends javax.swing.JFrame {
                 decreaseLife();
             }
             tfResult.requestFocus();
+        }
+    }
+
+    public void showArchivement() {
+        if (nbPoints % 10 == 0) {
+            showAnnimation();
+        }
+        if (nbPoints == 1) {
+            lstArchivement.getNext().setVisible(true);
+        } else if (nbPoints == 5) {
+            lstArchivement.getPrevious().setVisible(false);
+            lstArchivement.getNext().setVisible(true);
+        } else if (nbPoints == 10) {
+            lstArchivement.getPrevious().setVisible(false);
+            lstArchivement.getNext().setVisible(true);
+        } else if (nbPoints == 25) {
+            lstArchivement.getPrevious().setVisible(false);
+            lstArchivement.getNext().setVisible(true);
+        } else if (nbPoints == 50) {
+            lstArchivement.getPrevious().setVisible(false);
+            lstArchivement.getNext().setVisible(true);
+        }
+    }
+
+    public void showAnnimation() {
+        Timer tAnn = new Timer();
+        TimerAnnimation runAnn = new TimerAnnimation(lstAnnimation.getNextWithCycle());
+        tAnn.scheduleAtFixedRate(runAnn, 0, 15);        
+    }
+
+    public void resetArchivement() {
+        for (JLabel lab : lstArchivement) {
+            lab.setVisible(false);
         }
     }
 
@@ -241,7 +289,7 @@ public class GameFrame extends javax.swing.JFrame {
 
     public void stopTimer() {
         if (run != null) {
-            run.cancel();    
+            run.cancel();
         }
     }
 

@@ -197,6 +197,10 @@ public class Settings extends javax.swing.JFrame {
         parent.setLabelTime(conf.isTime());
         parent.resetLifesAndPoints();
         parent.showOperations();
+                      
+        parent.resetArchivement();
+        parent.getLstArchivement().resetCurrent();
+        parent.showArchivement();
         parent.validate();
     }
 
