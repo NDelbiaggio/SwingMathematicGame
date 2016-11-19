@@ -122,6 +122,9 @@ public class Settings extends javax.swing.JFrame {
         ckTime.setText(StringUtils.capitalize(resBund.getString("time")));
         btnDefaultSetting.setText(StringUtils.capitalize(resBund.getString("saveAsDefault")));
         btnApply.setText(StringUtils.capitalize(resBund.getString("apply")));
+        this.setTitle(StringUtils.capitalize(resBund.getString("settings")));
+        tfTable.setToolTipText(resBund.getString("tableToolTip"));
+        ckTime.setToolTipText(resBund.getString("timeToolTip"));
         setTraductionLanguages(resBund);
         this.validate();
     }
