@@ -1,4 +1,4 @@
-package com.delbiaggio.haagahelia.swingmath.tools;
+package com.delbiaggio.haagahelia.swingmath.timer;
 
 import java.util.TimerTask;
 import javax.swing.JLabel;

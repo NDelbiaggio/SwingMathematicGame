@@ -3,13 +3,13 @@
 #Maximum Number 
 1
 #Table 
-1;
+5;6;7;13;
 #list Symboles
 +;
 #time 
 false
 #number of seconds
-15
+30
 #Result all the time positive for substraction
 false#Language & country
 fr;FR

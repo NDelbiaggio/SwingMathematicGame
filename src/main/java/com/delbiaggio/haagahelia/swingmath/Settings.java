@@ -3,11 +3,11 @@ package com.delbiaggio.haagahelia.swingmath;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.domaine.Translation;
 import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
-import com.delbiaggio.haagahelia.swingmath.tools.FileManager;
+import com.delbiaggio.haagahelia.swingmath.tools.fileReader.readerCSV.FileManager;
+import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.MyFocusTraversalPolicy;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.event.ItemEvent;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.text.PlainDocument;
 import org.apache.commons.lang.StringUtils;
@@ -33,25 +32,16 @@ public class Settings extends javax.swing.JFrame {
     private Translation currentTrans;
     private String BACKGROUND = "backgroundSettings5.jpg";
     private boolean byUser = true;
-    
 
     public Settings(GameFrame parent) {
         initComponents();
-        this.setLayout(null);
-        setPositon();
-        setBackgroundImage();
-
-        initIntTextField();
-        tfTime.setVisible(false);
         this.parent = parent;
+        this.setLayout(null);
+        setPositonComponents();
+        setBackgroundImage();
+        setFilterToIntTextField();
+        //tfTime.setVisible(false);//
         Configuration conf = parent.getConf();
-        tfMin.setText(conf.getMinNumb() + "");
-        tfMax.setText(conf.getMaxNumb() + "");
-        tfTime.setText(conf.getNbSeconds() + "");
-        ckSubPos.setSelected(conf.isSoustractionPos());
-        if (conf.isTime()) {
-            ckTime.setSelected(true);
-        }
         setTraduction();
         String key = conf.getLocal().getDisplayLanguage(Locale.ENGLISH).toLowerCase();
         if (key.equals("ge")) {
@@ -64,23 +54,39 @@ public class Settings extends javax.swing.JFrame {
         setTabulationOrder();
     }
 
-    private void setPositon() {
+    public static Settings getCurrent(GameFrame parent) {
+        if (current == null) {
+            current = new Settings(parent);
+        }
+        return current;
+    }
+
+    private void setPositonComponents() {
+        setPositionCalculatingPart();
+        setPositionOperation();
+        setPositionOtherComponent();
+    }
+
+    private void setPositionCalculatingPart() {
         lblTable.setBounds(217, 275, 250, 30);
         lblMin.setBounds(217, 320, 250, 30);
         lblMax.setBounds(217, 365, 250, 30);
-        
         tfTable.setBounds(367, 275, 100, 30);
         tfMin.setBounds(367, 320, 100, 30);
         tfMax.setBounds(367, 365, 100, 30);
-        lblExample.setBounds(471, 275, 150 ,30);
-        
+        lblExample.setBounds(471, 275, 150, 30);
+    }
+
+    private void setPositionOperation() {
         ckAddition.setBounds(217, 86, 150, 30);
         ckSoustraction.setBounds(217, 126, 150, 30);
         ckMultiplication.setBounds(217, 166, 150, 30);
         ckDivision.setBounds(217, 206, 150, 30);
         ckSubPos.setBounds(368, 126, 250, 30);
         ckTime.setBounds(217, 418, 150, 30);
-        
+    }
+
+    private void setPositionOtherComponent() {
         tfTime.setBounds(367, 418, 100, 30);
         btnDefaultSetting.setBounds(217, 490, 250, 30);
         btnApply.setBounds(217, 530, 250, 30);
@@ -89,61 +95,18 @@ public class Settings extends javax.swing.JFrame {
     }
 
     private void setBackgroundImage() {
-        BufferedImage bi = null;
-        try {
-            InputStream s = getClass().getClassLoader().getResourceAsStream(BACKGROUND);
-            bi = ImageIO.read(s);
-            ImageIcon img = new ImageIcon(bi);
-            JLabel back = new JLabel(img);
-            back.setBounds(-165, -100, 1024, 805);
-            this.add(back);
-        } catch (Exception e) {
-            System.out.println(e.getMessage() + " " + e.getStackTrace());
-        }
+        JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon(BACKGROUND));
+        back.setBounds(-165, -100, 1024, 805);
+        this.add(back);
     }
 
-    private void reapaintComponent() {
-        lblTitre.repaint();
-        chLanguage.repaint();
-        ckAddition.repaint();
-        ckMultiplication.repaint();
-        ckDivision.repaint();
-        ckSoustraction.repaint();
-        ckSubPos.repaint();
-        lblMax.repaint();
-        lblMin.repaint();
-        lblTable.repaint();
-        ckTime.repaint();
-        btnApply.repaint();
-        btnDefaultSetting.repaint();
-        lblExample.repaint();
-    }
-
-    /*private void paintBackground(Graphics g) {
-        BufferedImage bi = null;
-        try {
-            InputStream s = getClass().getClassLoader().getResourceAsStream(BACKGROUND);
-            bi = ImageIO.read(s);
-        } catch (Exception e) {
-            System.out.println(e.getMessage() + " " + e.getStackTrace());
-        }
-        
-        g.drawImage(bi, 0, 0, getWidth(), getHeight(), null);
-    }*/
-    private void initIntTextField() {
+    private void setFilterToIntTextField() {
         PlainDocument doc = (PlainDocument) tfMin.getDocument();
         doc.setDocumentFilter(new MyIntFilter());
         doc = (PlainDocument) tfMax.getDocument();
         doc.setDocumentFilter(new MyIntFilter());
         doc = (PlainDocument) tfTime.getDocument();
         doc.setDocumentFilter(new MyIntFilter());
-    }
-
-    public static Settings getCurrent(GameFrame parent) {
-        if (current == null) {
-            current = new Settings(parent);
-        }
-        return current;
     }
 
     private void setTabulationOrder() {
@@ -154,18 +117,27 @@ public class Settings extends javax.swing.JFrame {
 
     private void setTraduction() {
         ResourceBundle resBund = parent.resBund;
-        lblTitre.setText("<html><u>"+StringUtils.capitalize(resBund.getString("settings")) + "</u></html>");
-        ckAddition.setText(StringUtils.capitalize(resBund.getString("addition")));
-        ckSoustraction.setText(StringUtils.capitalize(resBund.getString("substraction")));
-        ckMultiplication.setText(StringUtils.capitalize(resBund.getString("multiplication")));
-        ckAddition.setText(StringUtils.capitalize(resBund.getString("addition")));
-        ckSubPos.setText(StringUtils.capitalize(resBund.getString("positiveResult")));
+        lblTitre.setText("<html><u>" + StringUtils.capitalize(resBund.getString("settings")) + "</u></html>");
+        setTraductionOperations(resBund);
         lblTable.setText(StringUtils.capitalize(resBund.getString("table")));
         lblMin.setText(StringUtils.capitalize(resBund.getString("minNumb")));
         lblMax.setText(StringUtils.capitalize(resBund.getString("maxNumb")));
         ckTime.setText(StringUtils.capitalize(resBund.getString("time")));
         btnDefaultSetting.setText(StringUtils.capitalize(resBund.getString("saveAsDefault")));
         btnApply.setText(StringUtils.capitalize(resBund.getString("apply")));
+        setTraductionLanguages(resBund);
+        this.validate();
+    }
+
+    private void setTraductionOperations(ResourceBundle resBund) {
+        ckAddition.setText(StringUtils.capitalize(resBund.getString("addition")));
+        ckSoustraction.setText(StringUtils.capitalize(resBund.getString("substraction")));
+        ckMultiplication.setText(StringUtils.capitalize(resBund.getString("multiplication")));
+        ckAddition.setText(StringUtils.capitalize(resBund.getString("addition")));
+        ckSubPos.setText(StringUtils.capitalize(resBund.getString("positiveResult")));
+    }
+
+    private void setTraductionLanguages(ResourceBundle resBund) {
         byUser = false;
         chLanguage.removeAllItems();
         lstTrans = new ArrayList<Translation>();
@@ -175,29 +147,32 @@ public class Settings extends javax.swing.JFrame {
         for (Translation t : lstTrans) {
             chLanguage.addItem(t.getTrans());
         }
-        this.validate();
     }
 
-    private void updateConf() {
-        Configuration conf = parent.getConf();
+    private void updateConfiguration(Configuration conf) {
         conf.setMinNumb(Integer.parseInt(tfMin.getText()));
         conf.setMaxNumb(Integer.parseInt(tfMax.getText()));
         conf.setTime(ckTime.isSelected());
         conf.setSoustractionPos(ckSubPos.isSelected());
-        manageTable();
+        ArrayList confTables = CreateTablesFromString.convertStrToArray(tfTable.getText());
+        parent.getConf().setLstTable(confTables);
         parent.getConf().setLstOp(updateConfSymboles());
-        parent.manageNumberGeneration();
         if (ckTime.isSelected()) {
             conf.setNbSeconds(Integer.parseInt(tfTime.getText()));
             parent.testTimer();
-        }else{
+        } else {
             parent.stopTimer();
         }
         conf.setLocal(Language.valueOf(currentTrans.getKey()).getLocale());
+    }
+
+    private void updateGameFrameView() {
+        Configuration conf = parent.getConf();
+        updateConfiguration(conf);
+        parent.manageNumberGeneration();
         parent.setLabelTime(conf.isTime());
         parent.resetLifesAndPoints();
         parent.showOperationsImage();
-                      
         parent.resetArchivement();
         parent.getLstArchivement().resetCurrent();
         parent.showArchivement();
@@ -219,7 +194,7 @@ public class Settings extends javax.swing.JFrame {
             if (!(ckAddition.isSelected() || ckMultiplication.isSelected() || ckSoustraction.isSelected() || ckDivision.isSelected())) {
                 return false;
             }
-            if (CreateTablesFromString.manageTable(tfTable.getText()) == null) {
+            if (CreateTablesFromString.convertStrToArray(tfTable.getText()) == null) {
                 tfTable.setBackground(Color.red);
                 return false;
             }
@@ -268,15 +243,19 @@ public class Settings extends javax.swing.JFrame {
             ckSubPos.setVisible(true);
         } else {
             ckSubPos.setVisible(false);
-            repaint();
         }
         this.validate();
     }
 
-    private void init() {
+    private void initInformationToConf() {
         Configuration conf = parent.getConf();
         tfMin.setText(conf.getMinNumb() + "");
         tfMax.setText(conf.getMaxNumb() + "");
+        tfTime.setText(conf.getNbSeconds() + "");
+        ckSubPos.setSelected(conf.isSoustractionPos());
+        if (conf.isTime()) {
+            ckTime.setSelected(true);
+        }
         fillTfTable();
         fillSymboles();
         setCkSubstractionVisible();
@@ -297,6 +276,7 @@ public class Settings extends javax.swing.JFrame {
         ckAddition.setSelected(false);
         ckSoustraction.setSelected(false);
         ckMultiplication.setSelected(false);
+        ckDivision.setSelected(false);
         for (String sym : lstSymboles) {
             switch (sym) {
                 case "+":
@@ -315,11 +295,6 @@ public class Settings extends javax.swing.JFrame {
                     throw new AssertionError();
             }
         }
-    }
-
-    private void manageTable() {
-        ArrayList confTables = CreateTablesFromString.manageTable(tfTable.getText());
-        parent.getConf().setLstTable(confTables);
     }
 
     @SuppressWarnings("unchecked")
@@ -347,6 +322,7 @@ public class Settings extends javax.swing.JFrame {
         lblPosition = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 formMouseMoved(evt);
@@ -367,11 +343,6 @@ public class Settings extends javax.swing.JFrame {
         chLanguage.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 chLanguageItemStateChanged(evt);
-            }
-        });
-        chLanguage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chLanguageActionPerformed(evt);
             }
         });
 
@@ -418,6 +389,7 @@ public class Settings extends javax.swing.JFrame {
         lblMax.setText("Max number");
 
         tfTable.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        tfTable.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         tfTable.setToolTipText("Veuillez insérer les tables selon l'exemple");
         tfTable.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -427,11 +399,6 @@ public class Settings extends javax.swing.JFrame {
 
         tfMin.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         tfMin.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        tfMin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfMinActionPerformed(evt);
-            }
-        });
         tfMin.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtChanged(evt);
@@ -486,11 +453,6 @@ public class Settings extends javax.swing.JFrame {
 
         lblPosition.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         lblPosition.setText("jLabel1");
-        lblPosition.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                lblPositionMouseMoved(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -596,12 +558,12 @@ public class Settings extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
-        updateConf();
+        updateGameFrameView();
         this.dispose();
     }//GEN-LAST:event_btnApplyActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        init();
+        initInformationToConf();
     }//GEN-LAST:event_formWindowOpened
 
     private void ckTimeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckTimeItemStateChanged
@@ -623,7 +585,7 @@ public class Settings extends javax.swing.JFrame {
     }//GEN-LAST:event_ckSubPosItemStateChanged
 
     private void btnDefaultSettingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDefaultSettingActionPerformed
-        updateConf();
+        updateGameFrameView();
         FileManager.getCurrent().save(parent.getConf().printConf());
         this.dispose();
     }//GEN-LAST:event_btnDefaultSettingActionPerformed
@@ -656,18 +618,6 @@ public class Settings extends javax.swing.JFrame {
             byUser = true;
         }
     }//GEN-LAST:event_chLanguageItemStateChanged
-
-    private void chLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chLanguageActionPerformed
-
-    }//GEN-LAST:event_chLanguageActionPerformed
-
-    private void tfMinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfMinActionPerformed
-        System.out.println("appuyé");
-    }//GEN-LAST:event_tfMinActionPerformed
-
-    private void lblPositionMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPositionMouseMoved
-
-    }//GEN-LAST:event_lblPositionMouseMoved
 
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
         lblPosition.setText("X = " + evt.getX() + " Y = " + (evt.getY() - 24));

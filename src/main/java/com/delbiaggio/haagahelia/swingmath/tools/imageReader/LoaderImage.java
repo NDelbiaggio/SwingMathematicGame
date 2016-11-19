@@ -1,4 +1,4 @@
-package com.delbiaggio.haagahelia.swingmath.gameFrameComponents;
+package com.delbiaggio.haagahelia.swingmath.tools.imageReader;
 
 import com.delbiaggio.haagahelia.swingmath.GameFrame;
 import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;

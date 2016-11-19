@@ -7,13 +7,13 @@ package com.delbiaggio.haagahelia.swingmath;
 
 import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
-import com.delbiaggio.haagahelia.swingmath.gameFrameComponents.LoaderImage;
-import com.delbiaggio.haagahelia.swingmath.tools.FileManager;
+import com.delbiaggio.haagahelia.swingmath.tools.imageReader.LoaderImage;
+import com.delbiaggio.haagahelia.swingmath.tools.fileReader.readerCSV.FileManager;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.PGCDCalculator;
-import com.delbiaggio.haagahelia.swingmath.tools.TimerAnnimation;
-import com.delbiaggio.haagahelia.swingmath.tools.TimerBackgroundColor;
-import com.delbiaggio.haagahelia.swingmath.tools.TimerRun;
+import com.delbiaggio.haagahelia.swingmath.timer.TimerAnnimation;
+import com.delbiaggio.haagahelia.swingmath.timer.TimerBackgroundColor;
+import com.delbiaggio.haagahelia.swingmath.timer.TimerRun;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -63,10 +63,7 @@ public class GameFrame extends javax.swing.JFrame {
         setLabelTime(conf.isTime());
         validate();
         lblLifes.setBackground(this.getBackground());
-        PannelBackground p = new PannelBackground();
-        p.setSize(504, 186);
-        p.validate();
-
+        
         showLifesImage();
 
         new LoaderImage(this).setLayout();
@@ -344,6 +341,7 @@ public class GameFrame extends javax.swing.JFrame {
         lblLstOperations = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
         setSize(new java.awt.Dimension(787, 614));
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {

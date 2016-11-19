@@ -5,7 +5,7 @@ import java.util.StringTokenizer;
 
 public class CreateTablesFromString {
 
-    public static ArrayList<Integer> manageTable(String source) {
+    public static ArrayList<Integer> convertStrToArray(String source) {
         ArrayList<Integer> confTables = new ArrayList();
         String lstTable = source;
         StringTokenizer str = new StringTokenizer(lstTable, ";");

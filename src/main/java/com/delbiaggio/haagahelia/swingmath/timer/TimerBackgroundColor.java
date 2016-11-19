@@ -1,4 +1,4 @@
-package com.delbiaggio.haagahelia.swingmath.tools;
+package com.delbiaggio.haagahelia.swingmath.timer;
 
 
 import java.awt.Color;
