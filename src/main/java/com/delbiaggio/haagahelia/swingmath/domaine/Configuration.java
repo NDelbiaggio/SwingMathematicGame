@@ -1,12 +1,20 @@
 package com.delbiaggio.haagahelia.swingmath.domaine;
 
 
+import com.delbiaggio.haagahelia.swingmath.controller.MyList;
+import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.adapter.AdapterLocal;
 import java.util.ArrayList;
 import java.util.Locale;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+@XmlType(propOrder = { "minNumb", "maxNumb", "time","nbSeconds","soustractionPos","local","lstOp","lstTable"})
+@XmlRootElement(name = "Configuration")
 public class Configuration {
-    private ArrayList<String> lstOp;
-    private ArrayList<Integer> lstTable; //hésitation du cast
+    private MyList<String> lstOp;
+    private MyList<Integer> lstTable;
     private int minNumb;
     private int maxNumb;
     private boolean time;
@@ -22,8 +30,8 @@ public class Configuration {
         this.maxNumb = maxNumb;
         this.time = time;
         this.nbSeconds = nbSeconds;
-        lstOp = new ArrayList<String>();
-        lstTable = new ArrayList<Integer>();
+        lstOp = new MyList<String>();
+        lstTable = new MyList<Integer>();
         this.soustractionPos = sousPos;
         this.local = local;
     }
@@ -32,14 +40,16 @@ public class Configuration {
         return local;
     }
 
+    @XmlJavaTypeAdapter(AdapterLocal.class)
     public void setLocal(Locale local) {
         this.local = local;
     }
 
-    public boolean isSoustractionPos() {
+    public boolean getSoustractionPos() {
         return soustractionPos;
     }
 
+    @XmlElement(name = "Conf_soustractionPos")
     public void setSoustractionPos(boolean soustractionPos) {
         this.soustractionPos = soustractionPos;
     }
@@ -48,31 +58,34 @@ public class Configuration {
         return nbSeconds;
     }
 
+    @XmlElement(name = "Conf_nbSeconds")
     public void setNbSeconds(int nbSeconds) {
         this.nbSeconds = nbSeconds;
     }
     
     public void addOperation(String op){
-        lstOp.add(op);
+        lstOp.getList().add(op);
     }
 
     public void addTable(Integer table){
-        lstTable.add(table);
+        lstTable.getList().add(table);
     }
 
-    public ArrayList getLstOp() {
+    public MyList<String> getLstOp() {
         return lstOp;
     }
 
-    public void setLstOp(ArrayList lstOp) {
+    @XmlElement(name = "Conf_lstOperation")
+    public void setLstOp(MyList<String> lstOp) {
         this.lstOp = lstOp;
     }
 
-    public ArrayList<Integer> getLstTable() {
+    public MyList<Integer> getLstTable() {
         return lstTable;
     }
 
-    public void setLstTable(ArrayList<Integer> lstTable) {
+    @XmlElement(name = "Conf_lstTables")
+    public void setLstTable(MyList<Integer> lstTable) {
         this.lstTable = lstTable;
     }
 
@@ -92,7 +105,7 @@ public class Configuration {
         this.maxNumb = maxNumb;
     }
 
-    public boolean isTime() {
+    public boolean getTime() {
         return time;
     }
 
@@ -107,15 +120,15 @@ public class Configuration {
         st.append("#Maximum Number \n");
         st.append(getMaxNumb() + "\n");
         st.append("#Table \n");
-        for (Integer n : lstTable) {
+        for (Integer n : lstTable.getList()) {
             st.append(n+";");
         }
         st.append("\n#list Symboles\n");
-        for (String op : lstOp) {
+        for (String op : lstOp.getList()) {
             st.append(op+";");
         }
         st.append("\n#time \n");
-        if (isTime()) {
+        if (getTime()) {
             st.append("true");    
         }else{
             st.append("false");
@@ -123,7 +136,7 @@ public class Configuration {
         st.append("\n#number of seconds\n");
         st.append(getNbSeconds()+"\n");
         st.append("#Result all the time positive for substraction\n");
-        if (isSoustractionPos()) {
+        if (getSoustractionPos()) {
             st.append("true");    
         }else{
             st.append("false");

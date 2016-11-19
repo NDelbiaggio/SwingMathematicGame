@@ -14,6 +14,7 @@ import com.delbiaggio.haagahelia.swingmath.tools.PGCDCalculator;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerAnnimation;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerBackgroundColor;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerRun;
+import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class GameFrame extends javax.swing.JFrame {
         setPosition();
         PlainDocument doc = (PlainDocument) tfResult.getDocument();
         doc.setDocumentFilter(new MyIntFilter());
-        conf = FileManager.getCurrent().getInitialConf();
-        if (conf.isTime()) {
+        conf = XmlFileReader.getCurrent().getInitialConf();
+        if (conf.getTime()) {
             testTimer();
         }
         manageNumberGeneration();
@@ -60,7 +61,7 @@ public class GameFrame extends javax.swing.JFrame {
         resBund = ResourceBundle.getBundle("MessagesBundle", conf.getLocal());
         resBundImg = ResourceBundle.getBundle("ImgResources");
         setTranslation();
-        setLabelTime(conf.isTime());
+        setLabelTime(conf.getTime());
         validate();
         lblLifes.setBackground(this.getBackground());
         
@@ -79,7 +80,7 @@ public class GameFrame extends javax.swing.JFrame {
     }
     
     public void showOperationsImage() {
-        ArrayList<String> lstOP = conf.getLstOp();
+        ArrayList<String> lstOP = (ArrayList<String>)conf.getLstOp().getList();
         hideOperationsImage();
         int x = 271;
         for (String op : lstOP) {
@@ -165,7 +166,7 @@ public class GameFrame extends javax.swing.JFrame {
                 manageNumberGeneration();
                 colorBackRed(Color.green, 2);
                 tfResult.setText(" ");tfResult.setText("");
-                if (conf.isTime()) {
+                if (conf.getTime()) {
                     testTimer();
                 }
             } else {
@@ -247,12 +248,12 @@ public class GameFrame extends javax.swing.JFrame {
         String symb = generateSymbole();
         int alea = (int) Math.round(Math.random());
         int aleaNumb = generateNumber(conf.getMinNumb(), conf.getMaxNumb());
-        int indTabRand = generateNumber(0, conf.getLstTable().size() - 1);
-        Integer nbTable = conf.getLstTable().get(indTabRand);
+        int indTabRand = generateNumber(0, conf.getLstTable().getList().size() - 1);
+        Integer nbTable = conf.getLstTable().getList().get(indTabRand);
         int [] result;
         if (symb.equals("/")) {
             result = getGeneratedNumberDivision(nbTable);
-        } else if (conf.isSoustractionPos() && symb.equals("-")) {
+        } else if (conf.getSoustractionPos() && symb.equals("-")) {
             if (aleaNumb >= nbTable) {
                 result = new int[]{aleaNumb,nbTable};
             } else {
@@ -302,7 +303,7 @@ public class GameFrame extends javax.swing.JFrame {
     }
 
     private String generateSymbole() {
-        ArrayList<String> lstOp = conf.getLstOp();
+        ArrayList<String> lstOp = (ArrayList<String>)conf.getLstOp().getList();
         int ind = generateNumber(0, lstOp.size() - 1);
         lblOp.setText(lstOp.get(ind));
         return lstOp.get(ind);

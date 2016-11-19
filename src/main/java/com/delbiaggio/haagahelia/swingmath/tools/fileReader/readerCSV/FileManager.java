@@ -1,6 +1,7 @@
 package com.delbiaggio.haagahelia.swingmath.tools.fileReader.readerCSV;
 
 
+import com.delbiaggio.haagahelia.swingmath.controller.MyList;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
 import java.util.ArrayList;
@@ -32,8 +33,8 @@ public class FileManager {
         String [] local = lines.get(7).split(";");
         Locale loc = new Locale(local[0],local[1]);
         Configuration conf = new Configuration(minNum, maxNum, time, nbSeconds, resultPos,loc);
-        conf.setLstTable(CreateTablesFromString.convertStrToArray(lines.get(2)));
-        conf.setLstOp(getSymboles(lines.get(3)));
+        conf.setLstTable(new MyList<Integer>(CreateTablesFromString.convertStrToArray(lines.get(2))));
+        conf.setLstOp(new MyList<String>(getSymboles(lines.get(3))));
         save(conf.printConf());
         return conf;
     }

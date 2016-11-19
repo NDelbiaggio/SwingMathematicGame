@@ -1,21 +1,19 @@
 package com.delbiaggio.haagahelia.swingmath;
 
+import com.delbiaggio.haagahelia.swingmath.controller.MyList;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.domaine.Translation;
 import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
 import com.delbiaggio.haagahelia.swingmath.tools.fileReader.readerCSV.FileManager;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.MyFocusTraversalPolicy;
+import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.text.PlainDocument;
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +38,6 @@ public class Settings extends javax.swing.JFrame {
         setPositonComponents();
         setBackgroundImage();
         setFilterToIntTextField();
-        //tfTime.setVisible(false);//
         Configuration conf = parent.getConf();
         setTraduction();
         String key = conf.getLocal().getDisplayLanguage(Locale.ENGLISH).toLowerCase();
@@ -155,8 +152,8 @@ public class Settings extends javax.swing.JFrame {
         conf.setTime(ckTime.isSelected());
         conf.setSoustractionPos(ckSubPos.isSelected());
         ArrayList confTables = CreateTablesFromString.convertStrToArray(tfTable.getText());
-        parent.getConf().setLstTable(confTables);
-        parent.getConf().setLstOp(updateConfSymboles());
+        parent.getConf().setLstTable(new MyList<Integer>(confTables));
+        parent.getConf().setLstOp(new MyList<String>(getUpdateConfSymboles()));
         if (ckTime.isSelected()) {
             conf.setNbSeconds(Integer.parseInt(tfTime.getText()));
             parent.testTimer();
@@ -170,7 +167,7 @@ public class Settings extends javax.swing.JFrame {
         Configuration conf = parent.getConf();
         updateConfiguration(conf);
         parent.manageNumberGeneration();
-        parent.setLabelTime(conf.isTime());
+        parent.setLabelTime(conf.getTime());
         parent.resetLifesAndPoints();
         parent.showOperationsImage();
         parent.resetArchivement();
@@ -221,7 +218,7 @@ public class Settings extends javax.swing.JFrame {
         }
     }
 
-    private ArrayList<String> updateConfSymboles() {
+    private ArrayList<String> getUpdateConfSymboles() {
         ArrayList lstSymbole = new ArrayList();
         if (ckAddition.isSelected()) {
             lstSymbole.add("+");
@@ -252,17 +249,18 @@ public class Settings extends javax.swing.JFrame {
         tfMin.setText(conf.getMinNumb() + "");
         tfMax.setText(conf.getMaxNumb() + "");
         tfTime.setText(conf.getNbSeconds() + "");
-        ckSubPos.setSelected(conf.isSoustractionPos());
-        if (conf.isTime()) {
+        ckSubPos.setSelected(conf.getSoustractionPos());
+        if (conf.getTime()) {
             ckTime.setSelected(true);
         }
         fillTfTable();
         fillSymboles();
         setCkSubstractionVisible();
+        setTfTimeVisible();
     }
 
     private void fillTfTable() {
-        ArrayList<Integer> lstTables = parent.getConf().getLstTable();
+        ArrayList<Integer> lstTables = (ArrayList<Integer>)parent.getConf().getLstTable().getList();
         StringBuilder str = new StringBuilder();
         str.append(lstTables.get(0));
         for (int i = 1; i < lstTables.size(); i++) {
@@ -272,7 +270,7 @@ public class Settings extends javax.swing.JFrame {
     }
 
     private void fillSymboles() {
-        ArrayList<String> lstSymboles = parent.getConf().getLstOp();
+        ArrayList<String> lstSymboles = (ArrayList<String>)parent.getConf().getLstOp().getList();
         ckAddition.setSelected(false);
         ckSoustraction.setSelected(false);
         ckMultiplication.setSelected(false);
@@ -295,6 +293,16 @@ public class Settings extends javax.swing.JFrame {
                     throw new AssertionError();
             }
         }
+    }
+    
+    private void setTfTimeVisible(){
+        if (ckTime.isSelected()) {
+            tfTime.setVisible(true);
+            tfTime.setText(parent.getConf().getNbSeconds() + "");
+            this.validate();
+        } else {
+            tfTime.setVisible(false);
+        }        
     }
 
     @SuppressWarnings("unchecked")
@@ -567,13 +575,7 @@ public class Settings extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowOpened
 
     private void ckTimeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckTimeItemStateChanged
-        if (ckTime.isSelected()) {
-            tfTime.setVisible(true);
-            tfTime.setText(parent.getConf().getNbSeconds() + "");
-            this.validate();
-        } else {
-            tfTime.setVisible(false);
-        }
+        setTfTimeVisible();
     }//GEN-LAST:event_ckTimeItemStateChanged
 
     private void txtChanged(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtChanged
@@ -586,7 +588,7 @@ public class Settings extends javax.swing.JFrame {
 
     private void btnDefaultSettingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDefaultSettingActionPerformed
         updateGameFrameView();
-        FileManager.getCurrent().save(parent.getConf().printConf());
+        XmlFileReader.getCurrent().marshallConf(parent.getConf());
         this.dispose();
     }//GEN-LAST:event_btnDefaultSettingActionPerformed
 
