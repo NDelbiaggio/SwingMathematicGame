@@ -5,7 +5,6 @@
  */
 package com.delbiaggio.haagahelia.swingmath.vue;
 
-import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -30,12 +29,9 @@ public class ShowOperationsImage {
         return current;
     }       
     
-    public void showOperationsImage(ArrayList<String> lstOP,ArrayList<JLabel> lstOperations,Locale l) {
-        hideLstLabels(lstOperations);
-        int x = 271;
-        if (l.equals(Locale.GERMANY)) {
-            x = 360;
-        }
+    public void showOperationsImage(JLabel lbl,ArrayList<String> lstOP,ArrayList<JLabel> lstOperations) {
+        hideLstLabels(lstOperations);        
+        int x = lbl.getX() + lbl.getText().length()*10+10;        
         for (String op : lstOP) {
             findOperations(op,lstOperations, x);
             x += 60;
@@ -51,6 +47,10 @@ public class ShowOperationsImage {
         }
     }
     
+    
+    /*
+        Affichage d'une ArrayList de JLabel
+    */   
     public void hideLstLabels(ArrayList<JLabel> lst) {
         for (JLabel lab : lst) {
             lab.setVisible(false);
@@ -61,5 +61,14 @@ public class ShowOperationsImage {
         for (JLabel lab : lst) {
             lab.setVisible(true);
         }        
+    }
+    
+    public void hideLstLabels(int debut, ArrayList<JLabel> lst) {
+        if (debut < 0) {
+            return;
+        }
+        for (int i = debut; i < lst.size(); i++) {
+            lst.get(i).setVisible(false);
+        }
     }
 }

@@ -175,7 +175,7 @@ public class Settings extends javax.swing.JFrame {
         parent.manageNumberGeneration();
         parent.setLabelTime(conf.getTime());
         parent.resetLifesAndPoints();
-        ShowOperationsImage.getCurrent().showOperationsImage((ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations(), conf.getLocal());
+        ShowOperationsImage.getCurrent().showOperationsImage(parent.getLblLstOperations(),(ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations());
         ShowOperationsImage.getCurrent().hideLstLabels(parent.getLstArchivement());
         parent.getLstArchivement().resetCurrent();
         ShowAnnimationAndArchivements.getCurrent().showArchivement(parent.getLstArchivement(), parent.getLstAnnimation(), parent.getNbPoints());
@@ -632,10 +632,13 @@ public class Settings extends javax.swing.JFrame {
                 setTraduction();
                 byUser = false; // pour empêcher de retourner dans le if 
                 chLanguage.setSelectedIndex(lstTrans.indexOf(currentTrans));
-                Configuration conf = parent.getConf();
-                ShowOperationsImage.getCurrent().showOperationsImage((ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations(), conf.getLocal());
+                
                 //applique la traduction dans la fenêtre mère
                 parent.setTranslation();
+                
+                Configuration conf = parent.getConf();
+                ShowOperationsImage.getCurrent().showOperationsImage(parent.getLblLstOperations(),(ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations());
+                
             }
             byUser = true;
         }

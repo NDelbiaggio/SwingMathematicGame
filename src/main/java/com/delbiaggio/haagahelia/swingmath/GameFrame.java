@@ -16,7 +16,6 @@ import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
 import com.delbiaggio.haagahelia.swingmath.vue.ShowAnnimationAndArchivements;
 import com.delbiaggio.haagahelia.swingmath.vue.ShowOperationsImage;
 
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -69,7 +68,7 @@ public class GameFrame extends javax.swing.JFrame {
         lstLifes = loader.getLstLifesImage(nbLifes);
         loader.setLayout();
 
-        ShowOperationsImage.getCurrent().showOperationsImage((ArrayList<String>) conf.getLstOp().getList(), lstOperations, conf.getLocal());
+        ShowOperationsImage.getCurrent().showOperationsImage(lblLstOperations,(ArrayList<String>) conf.getLstOp().getList(), lstOperations);
     }
 
     public ArrayList<JLabel> getLstOperations() {
@@ -83,6 +82,20 @@ public class GameFrame extends javax.swing.JFrame {
     public ListLabel<JLabel> getLstAnnimation() {
         return lstAnnimation;
     }
+
+    public Configuration getConf() {
+        return this.conf;
+    }
+
+    public int getNbPoints() {
+        return nbPoints;
+    }
+
+    public JLabel getLblLstOperations() {
+        return lblLstOperations;
+    }
+    
+    
 
     private void setPosition() {
         btnCheck.setBounds(527, 308, 130, 25);
@@ -111,14 +124,6 @@ public class GameFrame extends javax.swing.JFrame {
         lblLstOperations.setText(StringUtils.capitalize(resBund.getString("operations")));
     }
 
-    public Configuration getConf() {
-        return this.conf;
-    }
-
-    public int getNbPoints() {
-        return nbPoints;
-    }
-
     public void setInitialState() {
         nbPoints = 0;
         nbLifes = 0;
@@ -134,14 +139,14 @@ public class GameFrame extends javax.swing.JFrame {
                 incrementPoints();
                 ShowAnnimationAndArchivements.getCurrent().showArchivement(lstArchivement, lstAnnimation, nbPoints);
                 manageNumberGeneration();
-                colorBackRed(Color.green, 2);
+                colorBackgroundTfResult(Color.green, 2);
                 tfResult.setText(" ");
                 tfResult.setText("");
                 if (conf.getTime()) {
                     setTimerSeconds();
                 }
             } else {
-                colorBackRed(Color.red, 2);
+                colorBackgroundTfResult(Color.red, 2);
                 decreaseLife();
             }
             tfResult.requestFocus();
@@ -154,7 +159,7 @@ public class GameFrame extends javax.swing.JFrame {
         lblPts.validate();
     }
 
-    public void colorBackRed(Color c, double timeSec) {
+    public void colorBackgroundTfResult(Color c, double timeSec) {
         Timer time = new Timer();
         TimerBackgroundColor runCol = new TimerBackgroundColor(tfResult, timeSec, c);
         time.scheduleAtFixedRate(runCol, 0, 500);
@@ -184,23 +189,14 @@ public class GameFrame extends javax.swing.JFrame {
 
     public void decreaseLife() {
         nbLifes--;
-        showLifes(nbLifes,lstLifes);
+        ShowOperationsImage.getCurrent().hideLstLabels(nbLifes, lstLifes);
     }
 
     public void resetLifesAndPoints() {
         nbPoints = 0;
-        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": 0"));
         nbLifes = LIFES;
+        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": "+nbPoints));
         ShowOperationsImage.getCurrent().showLstLabels(lstLifes);
-    }
-
-    private void showLifes(int nbLifes,ListLabel<JLabel> lstLifes) {
-        if (nbLifes<0) {
-            return;
-        }
-        for (int i = nbLifes; i < lstLifes.size(); i++) {
-            lstLifes.get(i).setVisible(false);
-        }
     }
 
     @SuppressWarnings("unchecked")

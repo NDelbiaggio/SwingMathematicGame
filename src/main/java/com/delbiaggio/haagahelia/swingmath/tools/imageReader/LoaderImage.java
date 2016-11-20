@@ -2,6 +2,7 @@ package com.delbiaggio.haagahelia.swingmath.tools.imageReader;
 
 import com.delbiaggio.haagahelia.swingmath.GameFrame;
 import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
+import com.delbiaggio.haagahelia.swingmath.vue.ShowOperationsImage;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javax.swing.JLabel;
@@ -35,6 +36,7 @@ public class LoaderImage {
 
     private void loadOperations() {
         ArrayList<JLabel> lstOp = parent.getLstOperations();
+        int x = 271;
         JLabel plus = getCustomisedJLabel(resBundImg.getString("+"), 271, 376, 50, 50);
         JLabel minus = getCustomisedJLabel(resBundImg.getString("-"), 345, 376, 50, 50);
         JLabel division = getCustomisedJLabel(resBundImg.getString("/"), 400, 376, 50, 50);
@@ -48,43 +50,36 @@ public class LoaderImage {
 
     private void loadArchivements() {
         ListLabel lstArch = parent.getLstArchivement();
-        JLabel regle = getCustomisedJLabel("regle.png", 600, 106, 50, 50);
-        regle.setVisible(false);
-        JLabel compas = getCustomisedJLabel("compas.png", 600, 106, 50, 89);
-        compas.setVisible(false);
-        JLabel tableau = getCustomisedJLabel("tableau.png", 600, 106, 50, 89);
-        tableau.setVisible(false);
-        JLabel calculette = getCustomisedJLabel("calculatrice.png", 600, 106, 50, 43);
-        calculette.setVisible(false);
-        JLabel bag = getCustomisedJLabel("bag.png", 600, 106, 60, 60);
-        bag.setVisible(false);
+        int x = 600;
+        int y = 106;
+        JLabel regle = getCustomisedJLabel("regle.png", x, y, 50, 50);
+        JLabel compas = getCustomisedJLabel("compas.png", x, y, 50, 89);
+        JLabel tableau = getCustomisedJLabel("tableau.png", x, y, 50, 89);
+        JLabel calculette = getCustomisedJLabel("calculatrice.png", x, y, 50, 43);
+        JLabel bag = getCustomisedJLabel("bag.png", x, y, 60, 60);
         addInArrayAndParent(lstArch, regle);
         addInArrayAndParent(lstArch, compas);
         addInArrayAndParent(lstArch, tableau);
         addInArrayAndParent(lstArch, calculette);
         addInArrayAndParent(lstArch, bag);
+        ShowOperationsImage.getCurrent().hideLstLabels(lstArch);
     }
 
     private void loadAnnimations() {
         ListLabel lstAnn = parent.getLstAnnimation();
         JLabel amb = getCustomisedJLabel("ambulance.png", 0, 0, 60, 45);
-        amb.setVisible(false);
         JLabel pompier = getCustomisedJLabel("pompier.png", 0, 0, 60, 45);
-        pompier.setVisible(false);
         JLabel moto = getCustomisedJLabel("moto.png", 0, 0, 60, 27);
-        moto.setVisible(false);
         JLabel police = getCustomisedJLabel("police2.png", 0, 0, 80, 28);
-        police.setVisible(false);
         JLabel bike = getCustomisedJLabel("bike2.png", 0, 0, 60, 35);
-        police.setVisible(false);
         JLabel spacial = getCustomisedJLabel("navette.png", 0, 0, 80, 63);
-        police.setVisible(false);
         addInArrayAndParent(lstAnn, bike);
         addInArrayAndParent(lstAnn, moto);
         addInArrayAndParent(lstAnn, police);
         addInArrayAndParent(lstAnn, amb);
         addInArrayAndParent(lstAnn, pompier);
         addInArrayAndParent(lstAnn, spacial);
+        ShowOperationsImage.getCurrent().hideLstLabels(lstAnn);
     }
 
     public ListLabel<JLabel> getLstLifesImage(int nbLifes) {
