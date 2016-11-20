@@ -4,7 +4,6 @@ import com.delbiaggio.haagahelia.swingmath.controller.MyList;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.domaine.Translation;
 import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
-import com.delbiaggio.haagahelia.swingmath.tools.fileReader.readerCSV.FileManager;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.MyFocusTraversalPolicy;
 import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
@@ -40,14 +39,8 @@ public class Settings extends javax.swing.JFrame {
         setFilterToIntTextField();
         Configuration conf = parent.getConf();
         setTraduction();
-        String key = conf.getLocal().getDisplayLanguage(Locale.ENGLISH).toLowerCase();
-        if (key.equals("ge")) {
-            key = "german";
-        }
-        int ind = lstTrans.indexOf(new Translation(key));
-        byUser = false;
-        chLanguage.setSelectedIndex(ind);
-        currentTrans = lstTrans.get(ind);
+        selectCorrectLanguage(parent.getConf());
+        
         setTabulationOrder();
     }
 
@@ -57,6 +50,14 @@ public class Settings extends javax.swing.JFrame {
         }
         return current;
     }
+    
+    private void selectCorrectLanguage(Configuration conf){
+        ResourceBundle resLanguageCount = ResourceBundle.getBundle("LanguageCountry");
+        String key = resLanguageCount.getString(conf.getLocal().getLanguage());
+        int ind = lstTrans.indexOf(new Translation(key));
+        chLanguage.setSelectedIndex(ind);
+        currentTrans = lstTrans.get(ind);        
+    }
 
     private void setPositonComponents() {
         setPositionCalculatingPart();
@@ -64,10 +65,11 @@ public class Settings extends javax.swing.JFrame {
         setPositionOtherComponent();
     }
 
+    //217
     private void setPositionCalculatingPart() {
-        lblTable.setBounds(217, 275, 250, 30);
-        lblMin.setBounds(217, 320, 250, 30);
-        lblMax.setBounds(217, 365, 250, 30);
+        lblTable.setBounds(185, 275, 250, 30);
+        lblMin.setBounds(185, 320, 250, 30);
+        lblMax.setBounds(185, 365, 250, 30);
         tfTable.setBounds(367, 275, 100, 30);
         tfMin.setBounds(367, 320, 100, 30);
         tfMax.setBounds(367, 365, 100, 30);
@@ -75,18 +77,18 @@ public class Settings extends javax.swing.JFrame {
     }
 
     private void setPositionOperation() {
-        ckAddition.setBounds(217, 86, 150, 30);
-        ckSoustraction.setBounds(217, 126, 150, 30);
-        ckMultiplication.setBounds(217, 166, 150, 30);
-        ckDivision.setBounds(217, 206, 150, 30);
+        ckAddition.setBounds(185, 86, 150, 30);
+        ckSoustraction.setBounds(185, 126, 200, 30);
+        ckMultiplication.setBounds(185, 166, 150, 30);
+        ckDivision.setBounds(185, 206, 150, 30);
         ckSubPos.setBounds(368, 126, 250, 30);
-        ckTime.setBounds(217, 418, 150, 30);
+        ckTime.setBounds(185, 418, 150, 30);
     }
 
     private void setPositionOtherComponent() {
         tfTime.setBounds(367, 418, 100, 30);
-        btnDefaultSetting.setBounds(217, 490, 250, 30);
-        btnApply.setBounds(217, 530, 250, 30);
+        btnDefaultSetting.setBounds(230, 490, 250, 30);
+        btnApply.setBounds(230, 530, 250, 30);
         lblTitre.setBounds(245, 48, 200, 30);
         chLanguage.setBounds(481, 48, 150, 30);
     }
@@ -133,7 +135,7 @@ public class Settings extends javax.swing.JFrame {
         ckAddition.setText(StringUtils.capitalize(resBund.getString("addition")));
         ckSoustraction.setText(StringUtils.capitalize(resBund.getString("substraction")));
         ckMultiplication.setText(StringUtils.capitalize(resBund.getString("multiplication")));
-        ckAddition.setText(StringUtils.capitalize(resBund.getString("addition")));
+        ckDivision.setText(StringUtils.capitalize(resBund.getString("division")));
         ckSubPos.setText(StringUtils.capitalize(resBund.getString("positiveResult")));
     }
 
@@ -143,10 +145,11 @@ public class Settings extends javax.swing.JFrame {
         lstTrans = new ArrayList<Translation>();
         lstTrans.add(new Translation("english", StringUtils.capitalize(resBund.getString("english"))));
         lstTrans.add(new Translation("french", StringUtils.capitalize(resBund.getString("french"))));
-        lstTrans.add(new Translation("german", StringUtils.capitalize(resBund.getString("german"))));
+        lstTrans.add(new Translation("deutsch", StringUtils.capitalize(resBund.getString("german"))));
         for (Translation t : lstTrans) {
             chLanguage.addItem(t.getTrans());
         }
+        byUser = true;
     }
 
     private void updateConfiguration(Configuration conf) {
@@ -172,7 +175,7 @@ public class Settings extends javax.swing.JFrame {
         parent.manageNumberGeneration();
         parent.setLabelTime(conf.getTime());
         parent.resetLifesAndPoints();
-        parent.showOperationsImage();
+        parent.showOperationsImage(conf.getLocal());
         parent.resetArchivement();
         parent.getLstArchivement().resetCurrent();
         parent.showArchivement();
@@ -181,6 +184,10 @@ public class Settings extends javax.swing.JFrame {
 
     private boolean isValide() {
         try {
+            if (Integer.parseInt(tfTime.getText())<1 && ckTime.isSelected()) {
+                tfTime.setBackground(Color.red);
+                return false;
+            }
             int min = Integer.parseInt(tfMin.getText());
             int max = Integer.parseInt(tfMax.getText());
             if (tfMax.getText().trim().isEmpty() || tfMin.getText().trim().isEmpty() || tfTable.getText().isEmpty()) {
@@ -209,6 +216,7 @@ public class Settings extends javax.swing.JFrame {
         tfMin.setBackground(Color.white);
         tfMax.setBackground(Color.white);
         tfTable.setBackground(Color.white);
+        tfTime.setBackground(Color.white);
     }
 
     private void validateButtonSave() {;
@@ -226,11 +234,11 @@ public class Settings extends javax.swing.JFrame {
         if (ckAddition.isSelected()) {
             lstSymbole.add("+");
         }
-        if (ckMultiplication.isSelected()) {
-            lstSymbole.add("*");
-        }
         if (ckSoustraction.isSelected()) {
             lstSymbole.add("-");
+        }
+        if (ckMultiplication.isSelected()) {
+            lstSymbole.add("*");
         }
         if (ckDivision.isSelected()) {
             lstSymbole.add("/");
@@ -434,6 +442,11 @@ public class Settings extends javax.swing.JFrame {
 
         tfTime.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         tfTime.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        tfTime.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tfTimeKeyReleased(evt);
+            }
+        });
 
         lblExample.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         lblExample.setText("ex(1-3;4)");
@@ -556,7 +569,7 @@ public class Settings extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ckTime)
                     .addComponent(tfTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
                 .addComponent(lblPosition)
                 .addGap(61, 61, 61)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -579,6 +592,8 @@ public class Settings extends javax.swing.JFrame {
 
     private void ckTimeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckTimeItemStateChanged
         setTfTimeVisible();
+        isValide();
+        validateButtonSave();
     }//GEN-LAST:event_ckTimeItemStateChanged
 
     private void txtChanged(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtChanged
@@ -616,7 +631,8 @@ public class Settings extends javax.swing.JFrame {
                 //applique la traduction
                 setTraduction();
                 byUser = false; // pour empêcher de retourner dans le if 
-                chLanguage.setSelectedIndex(lstTrans.indexOf(currentTrans)); // --> problème redéclenche le listeneur
+                chLanguage.setSelectedIndex(lstTrans.indexOf(currentTrans));
+                parent.showOperationsImage(loc);
                 //applique la traduction dans la fenêtre mère
                 parent.setTranslation();
             }
@@ -628,6 +644,11 @@ public class Settings extends javax.swing.JFrame {
         lblPosition.setText("X = " + evt.getX() + " Y = " + (evt.getY() - 24));
         lblPosition.validate();
     }//GEN-LAST:event_formMouseMoved
+
+    private void tfTimeKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfTimeKeyReleased
+        isValide();
+        validateButtonSave();
+    }//GEN-LAST:event_tfTimeKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

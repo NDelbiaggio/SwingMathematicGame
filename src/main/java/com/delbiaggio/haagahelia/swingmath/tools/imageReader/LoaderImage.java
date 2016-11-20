@@ -42,8 +42,9 @@ public class LoaderImage {
         JLabel multiplication = getCustomisedJLabel(resBundImg.getString("*"), 460, 376, 50, 50);
         addInArrayAndParent(lstOp, plus);
         addInArrayAndParent(lstOp, minus);
-        addInArrayAndParent(lstOp, division);
         addInArrayAndParent(lstOp, multiplication);
+        addInArrayAndParent(lstOp, division);
+        
     }
     
     private void loadArchivements() {

@@ -19,7 +19,7 @@ public class AdapterLocal extends XmlAdapter<String,Locale> {
     public Locale unmarshal(String v) throws Exception {
         StringTokenizer str = new StringTokenizer(v, ";");
         Locale l = new Locale(str.nextToken(), str.nextToken());
-        return Locale.FRANCE;
+        return l;
     }
 
     @Override

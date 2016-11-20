@@ -138,7 +138,7 @@
                   <Component id="ckTime" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tfTime" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="84" max="32767" attributes="0"/>
+              <EmptySpace pref="75" max="32767" attributes="0"/>
               <Component id="lblPosition" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="61" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -301,6 +301,9 @@
         </Property>
         <Property name="horizontalAlignment" type="int" value="4"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfTimeKeyReleased"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblExample">
       <Properties>

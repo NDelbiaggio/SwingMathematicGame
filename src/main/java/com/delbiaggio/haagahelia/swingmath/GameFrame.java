@@ -8,7 +8,6 @@ package com.delbiaggio.haagahelia.swingmath;
 import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.tools.imageReader.LoaderImage;
-import com.delbiaggio.haagahelia.swingmath.tools.fileReader.readerCSV.FileManager;
 import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.PGCDCalculator;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerAnnimation;
@@ -18,6 +17,7 @@ import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import javax.swing.JLabel;
@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class GameFrame extends javax.swing.JFrame {
 
-    private int LIFES = 7;
+    private int LIFES = 3;
     private int nbPoints = 0;
     private int nbLifes = LIFES;
     private int TIME = 15;
@@ -69,7 +69,7 @@ public class GameFrame extends javax.swing.JFrame {
 
         new LoaderImage(this).setLayout();
 
-        showOperationsImage();
+        showOperationsImage(conf.getLocal());
 
     }
 
@@ -79,10 +79,13 @@ public class GameFrame extends javax.swing.JFrame {
         }
     }
     
-    public void showOperationsImage() {
+    public void showOperationsImage(Locale l) {
         ArrayList<String> lstOP = (ArrayList<String>)conf.getLstOp().getList();
         hideOperationsImage();
         int x = 271;
+        if (l.equals(Locale.GERMANY)) {
+            x = 360;
+        }
         for (String op : lstOP) {
             findOperations(op,x);
             x += 60;
@@ -121,8 +124,8 @@ public class GameFrame extends javax.swing.JFrame {
 
     private void setPosition() {
         btnCheck.setBounds(527, 308, 130, 25);
-        lblPts.setBounds(164, 190, 200, 30);
-        lblLifes.setBounds(164, 228, 200, 30);
+        lblPts.setBounds(153, 190, 200, 30);
+        lblLifes.setBounds(153, 228, 200, 30);
         btnSettings.setBounds(527, 189, 130, 25);
         lblNumber1.setBounds(213, 318, 100, 15);
         lblOp.setBounds(270, 318, 50, 15);
@@ -143,6 +146,7 @@ public class GameFrame extends javax.swing.JFrame {
         lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": 0"));
         lblLifes.setText(StringUtils.capitalize(resBund.getString("lifes") + ": "));
         btnSettings.setText(StringUtils.capitalize(resBund.getString("settings")));
+        lblLstOperations.setText(StringUtils.capitalize(resBund.getString("operations")));
     }
 
     public Configuration getConf() {
