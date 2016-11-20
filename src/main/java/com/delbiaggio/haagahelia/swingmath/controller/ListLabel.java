@@ -50,4 +50,5 @@ public class ListLabel<JLabel> extends ArrayList<JLabel> {
     public void resetCurrent() {
         current = 0;
     }
+    
 }

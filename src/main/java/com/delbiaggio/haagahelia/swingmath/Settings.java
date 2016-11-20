@@ -4,9 +4,11 @@ import com.delbiaggio.haagahelia.swingmath.controller.MyList;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.domaine.Translation;
 import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
-import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
+import com.delbiaggio.haagahelia.swingmath.tools.imageReader.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.MyFocusTraversalPolicy;
 import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
+import com.delbiaggio.haagahelia.swingmath.vue.ShowAnnimationAndArchivements;
+import com.delbiaggio.haagahelia.swingmath.vue.ShowOperationsImage;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
@@ -37,10 +39,8 @@ public class Settings extends javax.swing.JFrame {
         setPositonComponents();
         setBackgroundImage();
         setFilterToIntTextField();
-        Configuration conf = parent.getConf();
         setTraduction();
         selectCorrectLanguage(parent.getConf());
-        
         setTabulationOrder();
     }
 
@@ -162,9 +162,9 @@ public class Settings extends javax.swing.JFrame {
         parent.getConf().setLstOp(new MyList<String>(getUpdateConfSymboles()));
         if (ckTime.isSelected()) {
             conf.setNbSeconds(Integer.parseInt(tfTime.getText()));
-            parent.testTimer();
+            parent.setTimerSeconds();
         } else {
-            parent.stopTimer();
+            parent.stopTimerSeconds();
         }
         conf.setLocal(Language.valueOf(currentTrans.getKey()).getLocale());
     }
@@ -175,10 +175,10 @@ public class Settings extends javax.swing.JFrame {
         parent.manageNumberGeneration();
         parent.setLabelTime(conf.getTime());
         parent.resetLifesAndPoints();
-        parent.showOperationsImage(conf.getLocal());
-        parent.resetArchivement();
+        ShowOperationsImage.getCurrent().showOperationsImage((ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations(), conf.getLocal());
+        ShowOperationsImage.getCurrent().hideLstLabels(parent.getLstArchivement());
         parent.getLstArchivement().resetCurrent();
-        parent.showArchivement();
+        ShowAnnimationAndArchivements.getCurrent().showArchivement(parent.getLstArchivement(), parent.getLstAnnimation(), parent.getNbPoints());
         parent.validate();
     }
 
@@ -632,7 +632,8 @@ public class Settings extends javax.swing.JFrame {
                 setTraduction();
                 byUser = false; // pour empêcher de retourner dans le if 
                 chLanguage.setSelectedIndex(lstTrans.indexOf(currentTrans));
-                parent.showOperationsImage(loc);
+                Configuration conf = parent.getConf();
+                ShowOperationsImage.getCurrent().showOperationsImage((ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations(), conf.getLocal());
                 //applique la traduction dans la fenêtre mère
                 parent.setTranslation();
             }

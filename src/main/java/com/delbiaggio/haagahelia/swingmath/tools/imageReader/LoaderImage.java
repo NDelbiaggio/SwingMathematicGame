@@ -2,7 +2,6 @@ package com.delbiaggio.haagahelia.swingmath.tools.imageReader;
 
 import com.delbiaggio.haagahelia.swingmath.GameFrame;
 import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
-import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javax.swing.JLabel;
@@ -16,7 +15,7 @@ public class LoaderImage {
     private String BACKGROUND = "mainBackground9.jpg";
     private String IMG_RES = "ImgResources";
     private String IMG_BORDER = "backgroundBorder.png";
-    
+
     private GameFrame parent;
     ResourceBundle resBundImg;
 
@@ -25,7 +24,7 @@ public class LoaderImage {
     }
 
     public void setLayout() {
-        resBundImg  = ResourceBundle.getBundle(IMG_RES);
+        resBundImg = ResourceBundle.getBundle(IMG_RES);
         loadOperations();
         loadArchivements();
         JLabel border = getCustomisedJLabel(IMG_BORDER, -120, -100, 1024, 805);
@@ -44,9 +43,9 @@ public class LoaderImage {
         addInArrayAndParent(lstOp, minus);
         addInArrayAndParent(lstOp, multiplication);
         addInArrayAndParent(lstOp, division);
-        
+
     }
-    
+
     private void loadArchivements() {
         ListLabel lstArch = parent.getLstArchivement();
         JLabel regle = getCustomisedJLabel("regle.png", 600, 106, 50, 50);
@@ -65,8 +64,8 @@ public class LoaderImage {
         addInArrayAndParent(lstArch, calculette);
         addInArrayAndParent(lstArch, bag);
     }
-    
-    private void loadAnnimations(){
+
+    private void loadAnnimations() {
         ListLabel lstAnn = parent.getLstAnnimation();
         JLabel amb = getCustomisedJLabel("ambulance.png", 0, 0, 60, 45);
         amb.setVisible(false);
@@ -85,7 +84,18 @@ public class LoaderImage {
         addInArrayAndParent(lstAnn, police);
         addInArrayAndParent(lstAnn, amb);
         addInArrayAndParent(lstAnn, pompier);
-        addInArrayAndParent(lstAnn, spacial);        
+        addInArrayAndParent(lstAnn, spacial);
+    }
+
+    public ListLabel<JLabel> getLstLifesImage(int nbLifes) {
+        ListLabel<JLabel> lstLifes = new ListLabel<>();
+        for (int i = 0; i < nbLifes; i++) {
+            JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon("pencil3.png"));
+            back.setBounds(230 + (i * 30), 221, 50, 38);
+            parent.add(back);
+            lstLifes.add(back);
+        }
+        return lstLifes;
     }
 
     private void addInArrayAndParent(ArrayList lst, JLabel l) {

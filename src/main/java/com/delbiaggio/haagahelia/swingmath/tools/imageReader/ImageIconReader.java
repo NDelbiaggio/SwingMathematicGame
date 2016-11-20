@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.delbiaggio.haagahelia.swingmath.tools;
+package com.delbiaggio.haagahelia.swingmath.tools.imageReader;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;

@@ -7,17 +7,20 @@ package com.delbiaggio.haagahelia.swingmath;
 
 import com.delbiaggio.haagahelia.swingmath.controller.ListLabel;
 import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
+import com.delbiaggio.haagahelia.swingmath.math.GeneratorManagement;
 import com.delbiaggio.haagahelia.swingmath.tools.imageReader.LoaderImage;
-import com.delbiaggio.haagahelia.swingmath.tools.ImageIconReader;
-import com.delbiaggio.haagahelia.swingmath.tools.PGCDCalculator;
-import com.delbiaggio.haagahelia.swingmath.timer.TimerAnnimation;
+import com.delbiaggio.haagahelia.swingmath.math.MathOperation;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerBackgroundColor;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerRun;
 import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
+import com.delbiaggio.haagahelia.swingmath.vue.ShowAnnimationAndArchivements;
+import com.delbiaggio.haagahelia.swingmath.vue.ShowOperationsImage;
+
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import javax.swing.JLabel;
@@ -39,10 +42,9 @@ public class GameFrame extends javax.swing.JFrame {
     private Timer t = new Timer();
     private TimerRun run;
     public ResourceBundle resBund;
-    public ResourceBundle resBundImg;
 
-    private ArrayList<JLabel> lstLifes = new ArrayList<>();
-    private ArrayList<JLabel> lstOperations = new ArrayList<>();
+    private ListLabel<JLabel> lstLifes = new ListLabel<>();
+    private ListLabel<JLabel> lstOperations = new ListLabel<>();
     private ListLabel<JLabel> lstArchivement = new ListLabel<>();
     private ListLabel<JLabel> lstAnnimation = new ListLabel<>();
 
@@ -54,51 +56,20 @@ public class GameFrame extends javax.swing.JFrame {
         doc.setDocumentFilter(new MyIntFilter());
         conf = XmlFileReader.getCurrent().getInitialConf();
         if (conf.getTime()) {
-            testTimer();
+            setTimerSeconds();
         }
         manageNumberGeneration();
         tfResult.requestFocusInWindow();
         resBund = ResourceBundle.getBundle("MessagesBundle", conf.getLocal());
-        resBundImg = ResourceBundle.getBundle("ImgResources");
         setTranslation();
-        setLabelTime(conf.getTime());
+        lblTime.setVisible((conf.getTime()));
         validate();
         lblLifes.setBackground(this.getBackground());
-        
-        showLifesImage();
+        LoaderImage loader = new LoaderImage(this);
+        lstLifes = loader.getLstLifesImage(nbLifes);
+        loader.setLayout();
 
-        new LoaderImage(this).setLayout();
-
-        showOperationsImage(conf.getLocal());
-
-    }
-
-    private void hideOperationsImage() {
-        for (JLabel lab : lstOperations) {
-            lab.setVisible(false);
-        }
-    }
-    
-    public void showOperationsImage(Locale l) {
-        ArrayList<String> lstOP = (ArrayList<String>)conf.getLstOp().getList();
-        hideOperationsImage();
-        int x = 271;
-        if (l.equals(Locale.GERMANY)) {
-            x = 360;
-        }
-        for (String op : lstOP) {
-            findOperations(op,x);
-            x += 60;
-        }
-    }
-
-    private void findOperations(String op, int x) {
-        for (JLabel lab : lstOperations) {
-            if (resBundImg.getString(op).equals(lab.getName())) {
-                lab.setVisible(true);
-                lab.setBounds(x, lab.getY(), lab.getWidth(), lab.getHeight());
-            }
-        }
+        ShowOperationsImage.getCurrent().showOperationsImage((ArrayList<String>) conf.getLstOp().getList(), lstOperations, conf.getLocal());
     }
 
     public ArrayList<JLabel> getLstOperations() {
@@ -111,15 +82,6 @@ public class GameFrame extends javax.swing.JFrame {
 
     public ListLabel<JLabel> getLstAnnimation() {
         return lstAnnimation;
-    }
-
-    private void showLifesImage() {
-        for (int i = 0; i < nbLifes; i++) {
-            JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon("pencil3.png"));
-            back.setBounds(-260 + (i * 30), -160, 1024, 805);
-            this.add(back);
-            lstLifes.add(back);
-        }
     }
 
     private void setPosition() {
@@ -153,6 +115,10 @@ public class GameFrame extends javax.swing.JFrame {
         return this.conf;
     }
 
+    public int getNbPoints() {
+        return nbPoints;
+    }
+
     public void setInitialState() {
         nbPoints = 0;
         nbLifes = 0;
@@ -164,14 +130,15 @@ public class GameFrame extends javax.swing.JFrame {
             int nb2 = Integer.parseInt(lblNumber2.getText().trim());
             String op = lblOp.getText();
             int result = Integer.parseInt(tfResult.getText().trim());
-            if (checkEquation(nb1, nb2, op, result)) {
+            if (MathOperation.checkEquation(nb1, nb2, op, result)) {
                 incrementPoints();
-                showArchivement();
+                ShowAnnimationAndArchivements.getCurrent().showArchivement(lstArchivement, lstAnnimation, nbPoints);
                 manageNumberGeneration();
                 colorBackRed(Color.green, 2);
-                tfResult.setText(" ");tfResult.setText("");
+                tfResult.setText(" ");
+                tfResult.setText("");
                 if (conf.getTime()) {
-                    testTimer();
+                    setTimerSeconds();
                 }
             } else {
                 colorBackRed(Color.red, 2);
@@ -180,52 +147,11 @@ public class GameFrame extends javax.swing.JFrame {
             tfResult.requestFocus();
         }
     }
-    
-    private void incrementPoints(){
+
+    private void incrementPoints() {
         nbPoints++;
-        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": "+ nbPoints));
+        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": " + nbPoints));
         lblPts.validate();
-    }
-
-    public void showArchivement() {
-        if (nbPoints % 10 == 0) {
-            showAnnimation();
-        }
-        switch (nbPoints) {
-            case 1:
-                lstArchivement.getNext().setVisible(true);
-                break;
-            case 5:
-                lstArchivement.getPrevious().setVisible(false);
-                lstArchivement.getNext().setVisible(true);
-                break;
-            case 10:
-                lstArchivement.getPrevious().setVisible(false);
-                lstArchivement.getNext().setVisible(true);
-                break;
-            case 25:
-                lstArchivement.getPrevious().setVisible(false);
-                lstArchivement.getNext().setVisible(true);
-                break;
-            case 50:
-                lstArchivement.getPrevious().setVisible(false);
-                lstArchivement.getNext().setVisible(true);
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void showAnnimation() {
-        Timer tAnn = new Timer();
-        TimerAnnimation runAnn = new TimerAnnimation(lstAnnimation.getNextWithCycle());
-        tAnn.scheduleAtFixedRate(runAnn, 0, 15);
-    }
-
-    public void resetArchivement() {
-        for (JLabel lab : lstArchivement) {
-            lab.setVisible(false);
-        }
     }
 
     public void colorBackRed(Color c, double timeSec) {
@@ -234,7 +160,7 @@ public class GameFrame extends javax.swing.JFrame {
         time.scheduleAtFixedRate(runCol, 0, 500);
     }
 
-    public void testTimer() {
+    public void setTimerSeconds() {
         if (run != null) {
             run.cancel();
         }
@@ -242,89 +168,38 @@ public class GameFrame extends javax.swing.JFrame {
         t.scheduleAtFixedRate(run, 0, 1000);
     }
 
-    public void stopTimer() {
+    public void stopTimerSeconds() {
         if (run != null) {
             run.cancel();
         }
     }
 
     public void manageNumberGeneration() {
-        String symb = generateSymbole();
-        int alea = (int) Math.round(Math.random());
-        int aleaNumb = generateNumber(conf.getMinNumb(), conf.getMaxNumb());
-        int indTabRand = generateNumber(0, conf.getLstTable().getList().size() - 1);
-        Integer nbTable = conf.getLstTable().getList().get(indTabRand);
-        int [] result;
-        if (symb.equals("/")) {
-            result = getGeneratedNumberDivision(nbTable);
-        } else if (conf.getSoustractionPos() && symb.equals("-")) {
-            if (aleaNumb >= nbTable) {
-                result = new int[]{aleaNumb,nbTable};
-            } else {
-                result = new int[]{nbTable,aleaNumb};
-            }
-        } else if (alea == 0) {
-            result = new int[]{aleaNumb,nbTable};
-        } else {
-            result = new int[]{nbTable,aleaNumb};
-        }
+        String symb = GeneratorManagement.getCurrent().generateSymbole(conf);
+        lblOp.setText(symb);
+        int[] result = GeneratorManagement.getCurrent().getTwoGeneratedNumbers(conf, symb);
         lblNumber1.setText(result[0] + "");
-        lblNumber2.setText(result[1]+ "");
+        lblNumber2.setText(result[1] + "");
     }
-    
-    private int[] getGeneratedNumberDivision(int nbTable ){
-        int nb1 = nbTable;
-        ArrayList<Integer> lstPGCD = PGCDCalculator.getPGCD(nbTable);
-        int nb2 = lstPGCD.get(generateNumber(0, lstPGCD.size() - 1));
-        return new int[]{nb1,nb2};        
-    } 
 
     public void decreaseLife() {
         nbLifes--;
-        showLifes();
+        showLifes(nbLifes,lstLifes);
     }
 
     public void resetLifesAndPoints() {
         nbPoints = 0;
         lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": 0"));
         nbLifes = LIFES;
-        for (JLabel life : lstLifes) {
-            life.setVisible(true);
-        }
+        ShowOperationsImage.getCurrent().showLstLabels(lstLifes);
     }
 
-    private void showLifes() {
-        for (int i = nbLifes; i >= 0 && i < LIFES; i++) {
+    private void showLifes(int nbLifes,ListLabel<JLabel> lstLifes) {
+        if (nbLifes<0) {
+            return;
+        }
+        for (int i = nbLifes; i < lstLifes.size(); i++) {
             lstLifes.get(i).setVisible(false);
-        }
-    }
-
-    /*
-    *return a random number between two borders
-     */
-    private int generateNumber(int min, int max) {
-        return min + (int) Math.round(Math.random() * (max - min));
-    }
-
-    private String generateSymbole() {
-        ArrayList<String> lstOp = (ArrayList<String>)conf.getLstOp().getList();
-        int ind = generateNumber(0, lstOp.size() - 1);
-        lblOp.setText(lstOp.get(ind));
-        return lstOp.get(ind);
-    }
-
-    private boolean checkEquation(int nb1, int nb2, String op, int result) {
-        switch (op) {
-            case "+":
-                return nb1 + nb2 == result;
-            case "-":
-                return nb1 - nb2 == result;
-            case "*":
-                return nb1 * nb2 == result;
-            case "/":
-                return nb1 / nb2 == result;
-            default:
-                throw new AssertionError();
         }
     }
 
