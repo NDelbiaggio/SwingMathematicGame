@@ -7,7 +7,6 @@ import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
 import com.delbiaggio.haagahelia.swingmath.tools.imageReader.ImageIconReader;
 import com.delbiaggio.haagahelia.swingmath.tools.MyFocusTraversalPolicy;
 import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
-import com.delbiaggio.haagahelia.swingmath.vue.ShowAnnimationAndArchivements;
 import com.delbiaggio.haagahelia.swingmath.vue.ShowOperationsImage;
 import java.awt.Color;
 import java.awt.Component;
@@ -42,6 +41,7 @@ public class Settings extends javax.swing.JFrame {
         setTraduction();
         selectCorrectLanguage(parent.getConf());
         setTabulationOrder();
+        lblPosition.setVisible(false);
     }
 
     public static Settings getCurrent(GameFrame parent) {
@@ -50,13 +50,13 @@ public class Settings extends javax.swing.JFrame {
         }
         return current;
     }
-    
-    private void selectCorrectLanguage(Configuration conf){
+
+    private void selectCorrectLanguage(Configuration conf) {
         ResourceBundle resLanguageCount = ResourceBundle.getBundle("LanguageCountry");
         String key = resLanguageCount.getString(conf.getLocal().getLanguage());
         int ind = lstTrans.indexOf(new Translation(key));
         chLanguage.setSelectedIndex(ind);
-        currentTrans = lstTrans.get(ind);        
+        currentTrans = lstTrans.get(ind);
     }
 
     private void setPositonComponents() {
@@ -95,7 +95,7 @@ public class Settings extends javax.swing.JFrame {
 
     private void setBackgroundImage() {
         JLabel back = new JLabel(ImageIconReader.getCurrent().readImageIcon(BACKGROUND));
-        back.setBounds(-165, -100, 1024, 805);
+        back.setBounds(0, 0, 700, 600);
         this.add(back);
     }
 
@@ -142,7 +142,7 @@ public class Settings extends javax.swing.JFrame {
     private void setTraductionLanguages(ResourceBundle resBund) {
         byUser = false;
         chLanguage.removeAllItems();
-        lstTrans = new ArrayList<Translation>();
+        lstTrans = new ArrayList<>();
         lstTrans.add(new Translation("english", StringUtils.capitalize(resBund.getString("english"))));
         lstTrans.add(new Translation("french", StringUtils.capitalize(resBund.getString("french"))));
         lstTrans.add(new Translation("deutsch", StringUtils.capitalize(resBund.getString("german"))));
@@ -160,31 +160,18 @@ public class Settings extends javax.swing.JFrame {
         ArrayList confTables = CreateTablesFromString.convertStrToArray(tfTable.getText());
         parent.getConf().setLstTable(new MyList<Integer>(confTables));
         parent.getConf().setLstOp(new MyList<String>(getUpdateConfSymboles()));
-        if (ckTime.isSelected()) {
-            conf.setNbSeconds(Integer.parseInt(tfTime.getText()));
-            parent.setTimerSeconds();
-        } else {
-            parent.stopTimerSeconds();
-        }
+        conf.setNbSeconds(Integer.parseInt(tfTime.getText()));
         conf.setLocal(Language.valueOf(currentTrans.getKey()).getLocale());
     }
 
     private void updateGameFrameView() {
-        Configuration conf = parent.getConf();
-        updateConfiguration(conf);
-        parent.manageNumberGeneration();
-        parent.setLabelTime(conf.getTime());
-        parent.resetLifesAndPoints();
-        ShowOperationsImage.getCurrent().showOperationsImage(parent.getLblLstOperations(),(ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations());
-        ShowOperationsImage.getCurrent().hideLstLabels(parent.getLstArchivement());
-        parent.getLstArchivement().resetCurrent();
-        ShowAnnimationAndArchivements.getCurrent().showArchivement(parent.getLstArchivement(), parent.getLstAnnimation(), parent.getNbPoints());
-        parent.validate();
+        updateConfiguration(parent.getConf());
+        parent.updateLayoutToConf();
     }
 
     private boolean isValide() {
         try {
-            if (Integer.parseInt(tfTime.getText())<1 && ckTime.isSelected()) {
+            if (Integer.parseInt(tfTime.getText()) < 1 && ckTime.isSelected()) {
                 tfTime.setBackground(Color.red);
                 return false;
             }
@@ -219,14 +206,9 @@ public class Settings extends javax.swing.JFrame {
         tfTime.setBackground(Color.white);
     }
 
-    private void validateButtonSave() {;
-        if (isValide()) {
-            btnApply.setEnabled(true);
-            btnDefaultSetting.setEnabled(true);
-        } else {
-            btnApply.setEnabled(false);
-            btnDefaultSetting.setEnabled(false);
-        }
+    private void validateButtonSave(boolean isValide) {
+        btnApply.setEnabled(isValide);
+        btnDefaultSetting.setEnabled(isValide);
     }
 
     private ArrayList<String> getUpdateConfSymboles() {
@@ -271,7 +253,7 @@ public class Settings extends javax.swing.JFrame {
     }
 
     private void fillTfTable() {
-        ArrayList<Integer> lstTables = (ArrayList<Integer>)parent.getConf().getLstTable().getList();
+        ArrayList<Integer> lstTables = (ArrayList<Integer>) parent.getConf().getLstTable().getList();
         StringBuilder str = new StringBuilder();
         str.append(lstTables.get(0));
         for (int i = 1; i < lstTables.size(); i++) {
@@ -281,7 +263,7 @@ public class Settings extends javax.swing.JFrame {
     }
 
     private void fillSymboles() {
-        ArrayList<String> lstSymboles = (ArrayList<String>)parent.getConf().getLstOp().getList();
+        ArrayList<String> lstSymboles = (ArrayList<String>) parent.getConf().getLstOp().getList();
         ckAddition.setSelected(false);
         ckSoustraction.setSelected(false);
         ckMultiplication.setSelected(false);
@@ -305,15 +287,15 @@ public class Settings extends javax.swing.JFrame {
             }
         }
     }
-    
-    private void setTfTimeVisible(){
+
+    private void setTfTimeVisible() {
         if (ckTime.isSelected()) {
             tfTime.setVisible(true);
             tfTime.setText(parent.getConf().getNbSeconds() + "");
             this.validate();
         } else {
             tfTime.setVisible(false);
-        }        
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -592,12 +574,11 @@ public class Settings extends javax.swing.JFrame {
 
     private void ckTimeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckTimeItemStateChanged
         setTfTimeVisible();
-        isValide();
-        validateButtonSave();
+        validateButtonSave(isValide());
     }//GEN-LAST:event_ckTimeItemStateChanged
 
     private void txtChanged(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtChanged
-        validateButtonSave();
+        validateButtonSave(isValide());
     }//GEN-LAST:event_txtChanged
 
     private void ckSubPosItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckSubPosItemStateChanged
@@ -611,7 +592,7 @@ public class Settings extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDefaultSettingActionPerformed
 
     private void ckItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckItemStateChanged
-        validateButtonSave();
+        validateButtonSave(isValide());
     }//GEN-LAST:event_ckItemStateChanged
 
     private void ckSubstrationItemChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ckSubstrationItemChanged
@@ -632,13 +613,10 @@ public class Settings extends javax.swing.JFrame {
                 setTraduction();
                 byUser = false; // pour empêcher de retourner dans le if 
                 chLanguage.setSelectedIndex(lstTrans.indexOf(currentTrans));
-                
                 //applique la traduction dans la fenêtre mère
                 parent.setTranslation();
-                
                 Configuration conf = parent.getConf();
-                ShowOperationsImage.getCurrent().showOperationsImage(parent.getLblLstOperations(),(ArrayList<String>)conf.getLstOp().getList(), parent.getLstOperations());
-                
+                ShowOperationsImage.getCurrent().showOperationsImage(parent.getLblLstOperations(), (ArrayList<String>) conf.getLstOp().getList(), parent.getLstOperations());
             }
             byUser = true;
         }
@@ -650,8 +628,7 @@ public class Settings extends javax.swing.JFrame {
     }//GEN-LAST:event_formMouseMoved
 
     private void tfTimeKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfTimeKeyReleased
-        isValide();
-        validateButtonSave();
+        validateButtonSave(isValide());
     }//GEN-LAST:event_tfTimeKeyReleased
 
 

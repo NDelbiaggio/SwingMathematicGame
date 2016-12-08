@@ -2,6 +2,10 @@ package com.delbiaggio.haagahelia.swingmath.tools;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+/**
+ *
+ * @author delbiaggionicolas
+ */
 
 public class CreateTablesFromString {
 

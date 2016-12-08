@@ -10,15 +10,15 @@ import com.delbiaggio.haagahelia.swingmath.domaine.Configuration;
 import com.delbiaggio.haagahelia.swingmath.math.GeneratorManagement;
 import com.delbiaggio.haagahelia.swingmath.tools.imageReader.LoaderImage;
 import com.delbiaggio.haagahelia.swingmath.math.MathOperation;
+import com.delbiaggio.haagahelia.swingmath.timer.TimerAnnMouve;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerBackgroundColor;
+import com.delbiaggio.haagahelia.swingmath.timer.TimerGameOver;
 import com.delbiaggio.haagahelia.swingmath.timer.TimerRun;
 import com.delbiaggio.haagahelia.swingmath.tools.fileReaderXML.XmlFileReader;
 import com.delbiaggio.haagahelia.swingmath.vue.ShowAnnimationAndArchivements;
 import com.delbiaggio.haagahelia.swingmath.vue.ShowOperationsImage;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Timer;
@@ -47,28 +47,25 @@ public class GameFrame extends javax.swing.JFrame {
     private ListLabel<JLabel> lstArchivement = new ListLabel<>();
     private ListLabel<JLabel> lstAnnimation = new ListLabel<>();
 
+    private JLabel annGrenouille = new JLabel();
+
     public GameFrame() {
         initComponents();
         this.setLayout(null);
-        setPosition();
+        setPositionComponents();
         PlainDocument doc = (PlainDocument) tfResult.getDocument();
         doc.setDocumentFilter(new MyIntFilter());
         conf = XmlFileReader.getCurrent().getInitialConf();
-        if (conf.getTime()) {
-            setTimerSeconds();
-        }
-        manageNumberGeneration();
         tfResult.requestFocusInWindow();
         resBund = ResourceBundle.getBundle("MessagesBundle", conf.getLocal());
         setTranslation();
-        lblTime.setVisible((conf.getTime()));
-        validate();
-        lblLifes.setBackground(this.getBackground());
         LoaderImage loader = new LoaderImage(this);
         lstLifes = loader.getLstLifesImage(nbLifes);
         loader.setLayout();
-
-        ShowOperationsImage.getCurrent().showOperationsImage(lblLstOperations,(ArrayList<String>) conf.getLstOp().getList(), lstOperations);
+        lblGameOver.setVisible(false);
+        updateLayoutToConf();
+        lblPosition.setVisible(false);
+   
     }
 
     public ArrayList<JLabel> getLstOperations() {
@@ -94,10 +91,12 @@ public class GameFrame extends javax.swing.JFrame {
     public JLabel getLblLstOperations() {
         return lblLstOperations;
     }
-    
-    
 
-    private void setPosition() {
+    public void setAnnGrenouille(JLabel annGrenouille) {
+        this.annGrenouille = annGrenouille;
+    }
+
+    private void setPositionComponents() {
         btnCheck.setBounds(527, 308, 130, 25);
         lblPts.setBounds(153, 190, 200, 30);
         lblLifes.setBounds(153, 228, 200, 30);
@@ -109,10 +108,7 @@ public class GameFrame extends javax.swing.JFrame {
         tfResult.setBounds(385, 309, 120, 30);
         lblTime.setBounds(358, 190, 200, 30);
         lblLstOperations.setBounds(153, 390, 200, 30);
-    }
-
-    public void setLabelTime(boolean result) {
-        lblTime.setVisible(result);
+        lblGameOver.setBounds(355, 236, 200, 30);
     }
 
     public void setTranslation() {
@@ -122,11 +118,6 @@ public class GameFrame extends javax.swing.JFrame {
         lblLifes.setText(StringUtils.capitalize(resBund.getString("lifes") + ": "));
         btnSettings.setText(StringUtils.capitalize(resBund.getString("settings")));
         lblLstOperations.setText(StringUtils.capitalize(resBund.getString("operations")));
-    }
-
-    public void setInitialState() {
-        nbPoints = 0;
-        nbLifes = 0;
     }
 
     private void checkResult() {
@@ -187,16 +178,37 @@ public class GameFrame extends javax.swing.JFrame {
         lblNumber2.setText(result[1] + "");
     }
 
+    public void updateLayoutToConf() {
+        manageNumberGeneration();
+        lblTime.setVisible(conf.getTime());
+        setInitialState();
+        ShowOperationsImage.getCurrent().showOperationsImage(lblLstOperations, (ArrayList<String>) conf.getLstOp().getList(), lstOperations);
+    }
+
     public void decreaseLife() {
         nbLifes--;
+        if (nbLifes <= 0) {
+            Timer time = new Timer();
+            TimerGameOver runCol = new TimerGameOver(nbPoints, lblGameOver);
+            time.scheduleAtFixedRate(runCol, 0, 1000);
+            setInitialState();
+        }
         ShowOperationsImage.getCurrent().hideLstLabels(nbLifes, lstLifes);
     }
 
-    public void resetLifesAndPoints() {
+    private void setInitialState() {
         nbPoints = 0;
         nbLifes = LIFES;
-        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": "+nbPoints));
+        lblPts.setText(StringUtils.capitalize(resBund.getString("points") + ": " + nbPoints));
         ShowOperationsImage.getCurrent().showLstLabels(lstLifes);
+        lstArchivement.getPrevious().setVisible(false);
+        lstArchivement.resetCurrent();
+        ShowAnnimationAndArchivements.getCurrent().showAnnimation(lstAnnimation);
+        if (conf.getTime()) {
+            setTimerSeconds();
+        } else {
+            stopTimerSeconds();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -215,6 +227,7 @@ public class GameFrame extends javax.swing.JFrame {
         btnCheck = new javax.swing.JButton();
         lblPosition = new javax.swing.JLabel();
         lblLstOperations = new javax.swing.JLabel();
+        lblGameOver = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -222,6 +235,11 @@ public class GameFrame extends javax.swing.JFrame {
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 formMouseMoved(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
             }
         });
         addWindowFocusListener(new java.awt.event.WindowFocusListener() {
@@ -281,6 +299,10 @@ public class GameFrame extends javax.swing.JFrame {
         lblLstOperations.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         lblLstOperations.setText("Operations: ");
 
+        lblGameOver.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        lblGameOver.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblGameOver.setText("Game Over!");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -322,6 +344,10 @@ public class GameFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(31, 31, 31)
                         .addComponent(lblLstOperations)))
+                .addGap(0, 452, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(344, 344, 344)
+                .addComponent(lblGameOver)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -340,14 +366,16 @@ public class GameFrame extends javax.swing.JFrame {
                     .addComponent(btnCheck))
                 .addGap(45, 45, 45)
                 .addComponent(lblTime)
-                .addGap(145, 145, 145)
+                .addGap(20, 20, 20)
+                .addComponent(lblGameOver)
+                .addGap(109, 109, 109)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNumber1)
                     .addComponent(lblOp)
                     .addComponent(lblNumber2)
                     .addComponent(lblEqual)
                     .addComponent(tfResult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
                 .addComponent(lblLstOperations)
                 .addGap(100, 100, 100)
                 .addComponent(lblPosition)
@@ -374,9 +402,21 @@ public class GameFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSettingsActionPerformed
 
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
-        lblPosition.setText("X = " + evt.getX() + " Y = " + (evt.getY() - 24));
-        lblPosition.validate();
+//        lblPosition.setText("X = " + evt.getX() + " Y = " + (evt.getY() - 24));
+//        lblPosition.validate();
     }//GEN-LAST:event_formMouseMoved
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        if (evt.getX() > 646 && evt.getX() < 668 && evt.getY() - 24 > 541 && evt.getY() - 24 < 548) {
+            showAnnimationCachee();
+        }
+    }//GEN-LAST:event_formMouseClicked
+
+    private void showAnnimationCachee() {
+        Timer time = new Timer();
+        TimerAnnMouve runCol = new TimerAnnMouve(annGrenouille);
+        time.scheduleAtFixedRate(runCol, 0, 30);
+    }
 
     /**
      * @param args the command line arguments
@@ -417,6 +457,7 @@ public class GameFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnCheck;
     private javax.swing.JButton btnSettings;
     private javax.swing.JLabel lblEqual;
+    private javax.swing.JLabel lblGameOver;
     private javax.swing.JLabel lblLifes;
     private javax.swing.JLabel lblLstOperations;
     private javax.swing.JLabel lblNumber1;

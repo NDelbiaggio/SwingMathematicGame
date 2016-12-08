@@ -7,6 +7,10 @@ import com.delbiaggio.haagahelia.swingmath.tools.CreateTablesFromString;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.StringTokenizer;
+/**
+ *
+ * @author delbiaggionicolas
+ */
 
 public class FileManager {
 

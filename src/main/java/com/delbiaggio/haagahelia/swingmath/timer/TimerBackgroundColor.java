@@ -4,6 +4,10 @@ package com.delbiaggio.haagahelia.swingmath.timer;
 import java.awt.Color;
 import java.util.TimerTask;
 import javax.swing.JTextField;
+/**
+ *
+ * @author delbiaggionicolas
+ */
 
 public class TimerBackgroundColor extends TimerTask {
 

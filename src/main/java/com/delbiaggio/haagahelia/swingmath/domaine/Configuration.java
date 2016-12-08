@@ -9,6 +9,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+/**
+ *
+ * @author delbiaggionicolas
+ */
 
 @XmlType(propOrder = { "minNumb", "maxNumb", "time","nbSeconds","soustractionPos","local","lstOp","lstTable"})
 @XmlRootElement(name = "Configuration")

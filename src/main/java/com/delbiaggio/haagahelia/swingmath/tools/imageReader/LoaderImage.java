@@ -31,12 +31,12 @@ public class LoaderImage {
         JLabel border = getCustomisedJLabel(IMG_BORDER, -120, -100, 1024, 805);
         parent.add(border);
         loadAnnimations();
+        loadAnnimationCachee();
         parent.add(getCustomisedJLabel(BACKGROUND, -120, -100, 1024, 805));
     }
 
     private void loadOperations() {
         ArrayList<JLabel> lstOp = parent.getLstOperations();
-        int x = 271;
         JLabel plus = getCustomisedJLabel(resBundImg.getString("+"), 271, 376, 50, 50);
         JLabel minus = getCustomisedJLabel(resBundImg.getString("-"), 345, 376, 50, 50);
         JLabel division = getCustomisedJLabel(resBundImg.getString("/"), 400, 376, 50, 50);
@@ -80,6 +80,12 @@ public class LoaderImage {
         addInArrayAndParent(lstAnn, pompier);
         addInArrayAndParent(lstAnn, spacial);
         ShowOperationsImage.getCurrent().hideLstLabels(lstAnn);
+    }
+    
+    private void loadAnnimationCachee(){
+        JLabel grenouille = getCustomisedJLabel("grenouille.png", 659, 551, 80, 72);
+        parent.add(grenouille);
+        parent.setAnnGrenouille(grenouille);
     }
 
     public ListLabel<JLabel> getLstLifesImage(int nbLifes) {

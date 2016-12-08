@@ -83,8 +83,6 @@ public class XmlFileReader {
     
     public Configuration getInitialConf(){
         File f = new File(FILEXML);
-        System.out.println(f.getAbsolutePath());
-        System.out.println(f.getPath());
         Configuration conf;
         if (f.exists()) {
             conf = unmarshallConf();

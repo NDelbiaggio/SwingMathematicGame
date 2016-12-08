@@ -5,6 +5,10 @@ import com.delbiaggio.haagahelia.swingmath.GameFrame;
 
 import java.util.TimerTask;
 import javax.swing.JLabel;
+/**
+ *
+ * @author delbiaggionicolas
+ */
 
 public class TimerRun extends TimerTask {
     private JLabel lbl;
