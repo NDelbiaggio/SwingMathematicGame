@@ -41,7 +41,7 @@ public class Settings extends javax.swing.JFrame {
         setTraduction();
         selectCorrectLanguage(parent.getConf());
         setTabulationOrder();
-        lblPosition.setVisible(false);
+        lblPosition.setVisible(true);
     }
 
     public static Settings getCurrent(GameFrame parent) {
@@ -78,7 +78,7 @@ public class Settings extends javax.swing.JFrame {
 
     private void setPositionOperation() {
         ckAddition.setBounds(185, 86, 150, 30);
-        ckSoustraction.setBounds(185, 126, 200, 30);
+        ckSoustraction.setBounds(185, 126, 175, 30);
         ckMultiplication.setBounds(185, 166, 150, 30);
         ckDivision.setBounds(185, 206, 150, 30);
         ckSubPos.setBounds(368, 126, 250, 30);
